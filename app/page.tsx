@@ -1,10 +1,7 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
 export default function Home() {
   return (
-      <main className={styles.main}>
-        <h1 style={{padding: '100px'}}>CRYPTO EXCHANGE</h1>
-      </main>
+    <>
+      <h1>CRYPTO EXCHANGE</h1>
+    </>
   );
 }
