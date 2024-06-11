@@ -1,1 +1,1 @@
-export * from "./CryptoExchange";
+export * from "./cryptoExchange";
