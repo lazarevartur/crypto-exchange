@@ -8,7 +8,7 @@ const themeConfig: DeepPartial<ThemeOverride> = {
       html: { height: "100%" },
       body: {
         height: "100%",
-        bg: "main",
+        bg: "#f5f7f9",
         color: "dark",
       },
       "#__next": {
