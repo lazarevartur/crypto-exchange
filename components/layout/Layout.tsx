@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <Flex flexDir="column" minHeight="100%" className={montserrat.className}>
       <Header />
-      <Flex as="main" flex="1 1 auto">
+      <Flex as="main" flex="1 1 auto" w='100%'>
         {children}
       </Flex>
       <Footer />
