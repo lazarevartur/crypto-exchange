@@ -11,19 +11,13 @@ const montserrat = Montserrat({
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <Container
-      display="flex"
-      maxW="1140px"
-      flexDir="column"
-      minHeight="100%"
-      className={montserrat.className}
-    >
+    <Flex flexDir="column" minHeight="100%" className={montserrat.className}>
       <Header />
       <Flex as="main" flex="1 1 auto">
         {children}
       </Flex>
       <Footer />
-    </Container>
+    </Flex>
   );
 };
 

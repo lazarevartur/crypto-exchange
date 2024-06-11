@@ -1,37 +1,25 @@
 "use client";
 
-import { Button, Flex, Icon, Image } from "@chakra-ui/react";
+import { Button, Container, Flex, Icon, Image } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/next-js";
-
-const links = [
-  {
-    title: "Главная",
-    href: "/",
-  },
-  {
-    title: "Правила",
-    href: "/rules",
-  },
-  {
-    title: "Контакты",
-    href: "/contacts",
-  },
-];
+import {LINKS_HEADER} from "@/constants";
 
 const Header = () => {
   return (
-    <Flex
+    <Container
       as="header"
       h="76px"
-      alignItems="center"
+      display="flex"
+      maxW="container.xl"
       justifyContent="space-between"
+      alignItems="center"
     >
       <Flex gap="20px" alignItems="center">
         <Link href="/">
           <Image src="/logo.svg" alt="logo" />
         </Link>
         <Flex gap="20px">
-          {links.map(({ href, title }) => (
+          {LINKS_HEADER.map(({ href, title }) => (
             <Link
               key={href}
               href={href}
@@ -49,10 +37,8 @@ const Header = () => {
           ))}
         </Flex>
       </Flex>
-      <Flex>
-        <Button variant="outline">Wallet Connect</Button>
-      </Flex>
-    </Flex>
+      <Button variant="outline">Wallet Connect</Button>
+    </Container>
   );
 };
 

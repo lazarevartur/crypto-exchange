@@ -2,6 +2,7 @@ import type { DeepPartial, ThemeOverride } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
 
 const themeConfig: DeepPartial<ThemeOverride> = {
+  sizes: { container: { xl: "1140px" } },
   styles: {
     global: () => ({
       html: { height: "100%" },
