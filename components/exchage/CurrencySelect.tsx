@@ -3,6 +3,7 @@ import {
   ChakraStylesConfig,
   components,
   ControlProps,
+  createFilter,
   GroupBase,
   MenuListProps,
   OptionProps,
@@ -10,19 +11,31 @@ import {
   SelectComponentsConfig,
   ValueContainerProps,
 } from "chakra-react-select";
-import { FC, useId, useMemo, useRef } from "react";
+import React, { FC, ReactNode, useId, useMemo, useRef } from "react";
 import {
   Box,
   Flex,
+  HStack,
   Image,
   Text,
   useDisclosure,
   useOutsideClick,
+  useRadio,
+  useRadioGroup,
+  UseRadioProps,
 } from "@chakra-ui/react";
 import { IReserveItem } from "@/lib/types";
+import { CATEGORIES } from "@/constants";
 
 interface IMenuListDefaultProps
   extends MenuListProps<IReserveItem, boolean, GroupBase<IReserveItem>> {}
+
+const filterConfig: Parameters<typeof createFilter<IReserveItem>>[0] = {
+  ignoreCase: true,
+  ignoreAccents: true,
+  trim: true,
+  stringify: (option) => `${option.data.name}`,
+};
 
 const selectStyles = (isOpen: boolean): ChakraStylesConfig => ({
   container: (provided) => ({ ...provided, w: "347px" }),
@@ -55,6 +68,7 @@ const selectStyles = (isOpen: boolean): ChakraStylesConfig => ({
       transition: "all .2s",
     },
   }),
+  placeholder: (provided) => ({ ...provided, position: "absolute" }),
 });
 
 const Option: FC<OptionProps<IReserveItem>> = ({
@@ -85,15 +99,69 @@ const Option: FC<OptionProps<IReserveItem>> = ({
   );
 };
 
-const MenuList: FC<IMenuListDefaultProps> = ({ children }) => {
+function RadioCard(props: UseRadioProps & { children: ReactNode }) {
+  const { getInputProps, getRadioProps } = useRadio(props);
+
+  const input = getInputProps();
+  const checkbox = getRadioProps();
+
   return (
-    <Flex flexDir="column">
-      <Flex color="red" flexDir="column" px="10px">
-        <Flex>TABS</Flex>
-        <Flex>SEARCH</Flex>
+    <Box as="label">
+      <input {...input} />
+      <Box
+        {...checkbox}
+        fontSize="14px"
+        color="black"
+        border="2px solid"
+        borderColor="#d8dadc"
+        borderRadius="10px"
+        boxShadow="0 1px 4px rgba(0, 0, 0, .2)"
+        _hover={{ boxShadow: "0 1px 4px rgba(0, 0, 0, .5)" }}
+        _checked={{ boxShadow: "none", borderColor: "#fad753" }}
+        textTransform="uppercase"
+        p="5px"
+      >
+        {props.children}
+      </Box>
+    </Box>
+  );
+}
+
+function Buttons() {
+  const options = CATEGORIES;
+
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: "categories",
+    defaultValue: "all",
+    onChange: console.log,
+  });
+
+  const group = getRootProps();
+  const allRadio = getRadioProps({ value: "all" });
+
+  return (
+    <HStack {...group}>
+      <RadioCard {...allRadio}>All</RadioCard>
+      {options.map((value) => {
+        const radio = getRadioProps({ value });
+        return (
+          <RadioCard key={value} {...radio}>
+            {value}
+          </RadioCard>
+        );
+      })}
+    </HStack>
+  );
+}
+
+const MenuList: FC<IMenuListDefaultProps> = (props) => {
+  return (
+    <Flex flexDir="column" display="contents">
+      <Flex color="red" flexDir="column" px="10px" py="5px" gap="5px">
+        <Buttons />
       </Flex>
-      <Flex flexDir="column" h="400px" overflow="auto">
-        {children}
+      <Flex flexDir="column" maxH="400px" overflow="auto">
+        {props.children}
       </Flex>
     </Flex>
   );
@@ -105,7 +173,7 @@ const ValueContainer: FC<ValueContainerProps<IReserveItem>> = (props) => {
   if (!value) {
     return (
       <components.ValueContainer {...props}>
-        <Flex>{props.children}</Flex>
+        <Flex color="#212121">{props.children}</Flex>
       </components.ValueContainer>
     );
   }
@@ -180,14 +248,16 @@ export const CurrencySelect = ({ options }: { options: IReserveItem[] }) => {
   return (
     <Box ref={ref} h="100%">
       <Select
+        isSearchable
+        menuIsOpen
         toggleMenu={onToggle}
         options={options}
-        isSearchable={false}
+        placeholder="Search your token"
         instanceId={id}
-        menuIsOpen
         classNamePrefix="currencySelect"
         chakraStyles={styles}
-        onBlur={() => onClose()}
+        // @ts-ignore
+        filterOption={createFilter(filterConfig)}
         // @ts-ignore
         components={components}
       />
