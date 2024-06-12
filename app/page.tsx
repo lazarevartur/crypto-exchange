@@ -1,10 +1,12 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Flex } from "@chakra-ui/react";
+import { CryptoExchange } from "@/components/exchage";
+import { CryptoReserves } from "@/components/reserves";
 
 export default function Home() {
   return (
-      <main className={styles.main}>
-        <h1 style={{padding: '100px'}}>CRYPTO EXCHANGE</h1>
-      </main>
+    <Flex w="100%" flexDir="column">
+      <CryptoExchange />
+      <CryptoReserves />
+    </Flex>
   );
 }
