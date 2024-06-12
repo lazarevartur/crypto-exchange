@@ -27,10 +27,9 @@ function getRandomNumber() {
 }
 
 function getRandomCategories() {
-  const categories = CATEGORIES;
-  const numberOfCategories = Math.floor(Math.random() * categories.length) + 1;
+  const numberOfCategories = Math.floor(Math.random() * CATEGORIES.length) + 1;
 
-  const shuffledCategories = categories.sort(() => 0.5 - Math.random());
+  const shuffledCategories = CATEGORIES.sort(() => 0.5 - Math.random());
   return shuffledCategories.slice(0, numberOfCategories);
 }
 

@@ -23,7 +23,7 @@ const themeConfig: DeepPartial<ThemeOverride> = {
         fontWeight: 500,
       },
       "::-webkit-scrollbar-thumb": {
-        background: "disable",
+        background: "#fcbf11",
         borderRadius: "64px",
       },
       "::-webkit-scrollbar": {
