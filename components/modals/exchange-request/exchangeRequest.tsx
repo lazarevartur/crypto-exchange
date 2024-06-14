@@ -112,7 +112,7 @@ const SecondStep = () => (
 const steps = [FirstStep, SecondStep];
 
 const ExchangeRequest = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure({ defaultIsOpen: true });
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { activeStep, goToNext } = useSteps({
     index: 1,
     count: steps.length,
