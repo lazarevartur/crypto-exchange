@@ -17,4 +17,4 @@ export const LINKS_HEADER = [
   },
 ];
 
-export const CATEGORIES = ["usd", "eur", "crypto", "defi", 'rub'];
+export const CATEGORIES = ["usd", "eur", "crypto", "defi"];
