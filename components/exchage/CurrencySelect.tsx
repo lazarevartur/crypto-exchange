@@ -38,13 +38,17 @@ const filterConfig: Parameters<typeof createFilter<IReserveItem>>[0] = {
 };
 
 const selectStyles = (isOpen: boolean): ChakraStylesConfig => ({
-  container: (provided) => ({ ...provided, w: "347px" }),
+  container: (provided) => ({
+    ...provided,
+    w: "100%",
+    _focusVisible: { boxShadow: "none" },
+  }),
   menu: (provided) => ({
     ...provided,
     mt: "0px",
     bg: "white",
     opacity: isOpen ? 1 : 0,
-    transition: "all .3s",
+    transition: "all .2s",
     visibility: isOpen ? "visible" : "hidden",
     border: "1px solid #120773",
   }),
@@ -56,6 +60,7 @@ const selectStyles = (isOpen: boolean): ChakraStylesConfig => ({
     borderRadius: "none",
     borderColor: "#dae0e7",
     boxShadow: "0 0 15px rgba(255, 255, 255, .25)",
+    _focusVisible: { boxShadow: "none" },
   }),
   dropdownIndicator: (provided) => ({
     ...provided,

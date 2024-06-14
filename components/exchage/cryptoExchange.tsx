@@ -1,6 +1,22 @@
-import { Box, Button, Container, Flex, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { CurrencySelect } from "@/components/exchage/CurrencySelect";
 import { MockData } from "@/mock";
+import { ExchangeRequest } from "@/components/modals";
 
 const CryptoExchange = () => {
   return (
@@ -20,9 +36,14 @@ const CryptoExchange = () => {
           Быстрый и безопасный способ обменять более 20 популярных криптовалют
         </Text>
         <Flex gap="1px">
-          <CurrencySelect options={MockData} />
-          <CurrencySelect options={MockData} />
-          <Button h="60px">Обменять</Button>
+          <Box w="350px">
+            <CurrencySelect options={MockData} />
+          </Box>
+          <Box w="350px">
+            <CurrencySelect options={MockData} />
+          </Box>
+
+          <ExchangeRequest />
         </Flex>
       </Container>
     </Box>
