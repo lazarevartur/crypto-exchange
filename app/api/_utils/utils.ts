@@ -10,14 +10,14 @@ export const authenticateUser = (req: NextRequest) => {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return { user: null, error: NextResponse.json({ message: "Authentication required" }, { status: 401 }) };
+    return { userId: null, error: NextResponse.json({ message: "Authentication required" }, { status: 401 }) };
   }
 
   try {
     const decodedToken = verify(token, secret) as JwtPayload;
     return { userId: decodedToken.userId, error: null };
   } catch (err) {
-    return { user: null, error: NextResponse.json({ message: "Invalid token" }, { status: 403 }) };
+    return { userId: null, error: NextResponse.json({ message: "Invalid token" }, { status: 403 }) };
   }
 };
 
