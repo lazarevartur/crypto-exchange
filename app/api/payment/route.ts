@@ -3,39 +3,41 @@ import { NextResponse } from "next/server";
 import { sign, decode, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
 import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
 import type { NextRequest } from "next/server";
+import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || "your-secret-key";
 
-interface PaymentData {
-  from: {
-    tokenNameOrId: string;
-    amount: string;
-  };
-  to: {
-    tokenNameOrId: string;
-    amount: string;
-  };
-  recipient: {
-    address: string;
-    email: string;
-  };
-}
+// Определение схемы данных с использованием Zod
+const PaymentDataSchema = z.object({
+  from: z.object({
+    tokenNameOrId: z.string().nonempty(),
+    amount: z.string().nonempty(),
+  }),
+  to: z.object({
+    tokenNameOrId: z.string().nonempty(),
+    amount: z.string().nonempty(),
+  }),
+  recipient: z.object({
+    address: z.string().nonempty(),
+    email: z.string().email(),
+  }),
+});
 
-// Обработка POST запросов для создания пользователя и платежей
 export async function POST(req: NextRequest) {
   try {
-    const data: PaymentData = await req.json();
+    const result = PaymentDataSchema.safeParse(await req.json());
 
-    if (!data || !data.from || !data.to || !data.recipient ||
-        !data.from.tokenNameOrId || !data.from.amount ||
-        !data.to.tokenNameOrId || !data.to.amount ||
-        !data.recipient.address || !data.recipient.email) {
-      return NextResponse.json({ message: "Invalid input data" }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({ message: "Invalid input data", errors: result.error.errors }, { status: 400 });
     }
 
+    const data = result.data;
     const token = req.cookies.get("token")?.value;
+
+    const ttl = dayjs().add(15, 'minute').toDate();  // Установка TTL на 15 минут вперед
 
     if (!token) {
       // Создаем нового пользователя и генерируем токен
@@ -48,7 +50,8 @@ export async function POST(req: NextRequest) {
               toToken: data.to.tokenNameOrId,
               toAmount: data.to.amount,
               recipientAddress: data.recipient.address,
-              recipientEmail: data.recipient.email
+              recipientEmail: data.recipient.email,
+              ttl: ttl,
             }],
           },
         },
@@ -91,7 +94,10 @@ export async function POST(req: NextRequest) {
             toAmount: data.to.amount,
             recipientAddress: data.recipient.address,
             recipientEmail: data.recipient.email,
-            userId,
+            ttl: ttl,
+            user: {
+              connect: { id: userId }
+            }
           },
         });
 
@@ -106,7 +112,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Обработка GET запросов для проверки пользователя и получения его платежей
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
