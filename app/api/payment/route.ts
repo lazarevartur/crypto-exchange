@@ -1,12 +1,11 @@
 // app/api/payment/route.ts
 import { NextResponse } from "next/server";
-import { sign, decode, verify, JwtPayload } from "jsonwebtoken";
+import { sign, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
 import { PrismaClient, PaymentStatus } from "@prisma/client";
 import { z } from "zod";
-import dayjs from 'dayjs';
-
 import type { NextRequest } from "next/server";
+import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || "your-secret-key";
@@ -59,6 +58,7 @@ export async function POST(req: NextRequest) {
               expiresIn: expiresIn,
               createdAt: createdAt,
               status: PaymentStatus.PENDING,  // установим статус по умолчанию
+              approveStatus: PaymentStatus.PENDING,  // установим approveStatus по умолчанию
             }],
           },
         },
@@ -104,6 +104,7 @@ export async function POST(req: NextRequest) {
             expiresIn: expiresIn,
             createdAt: createdAt,
             status: PaymentStatus.PENDING,  // установим статус по умолчанию
+            approveStatus: PaymentStatus.PENDING,  // установим approveStatus по умолчанию
             user: {
               connect: { id: userId }
             }

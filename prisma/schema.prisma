@@ -34,4 +34,5 @@ model Payment {
   createdAt        DateTime      @default(now()) @map("created_at")
   closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
+  approveStatus    PaymentStatus @default(PENDING) // добавляем поле approveStatus
 }
