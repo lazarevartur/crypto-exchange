@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { sign, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
-import { PrismaClient, PaymentStatus } from "@prisma/client";
+import { PrismaClient, PaymentStatus, UserRole } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 import dayjs from 'dayjs';
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         data: {
           account: data.account,  // установим поле account
           createdAt: createdAt,
+          role: UserRole.USER,  // установим роль по умолчанию
           payments: {
             create: [{
               fromToken: data.from.tokenNameOrId,

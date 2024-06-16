@@ -13,11 +13,17 @@ enum PaymentStatus {
   ACCEPTED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id        String    @id @default(uuid())
   account   String?
   payments  Payment[]
   createdAt DateTime  @default(now()) @map("created_at")
+  role      UserRole  @default(USER)
 }
 
 model Payment {
@@ -34,5 +40,5 @@ model Payment {
   createdAt        DateTime      @default(now()) @map("created_at")
   closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
-  approveStatus    PaymentStatus @default(PENDING) // добавляем поле approveStatus
+  approveStatus    PaymentStatus @default(PENDING)
 }
