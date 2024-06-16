@@ -24,6 +24,7 @@ const PaymentDataSchema = z.object({
     address: z.string().nonempty(),
     email: z.string().email(),
   }),
+  account: z.string().optional(), // добавлено поле account
 });
 
 export async function POST(req: NextRequest) {
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
       // Создаем нового пользователя и генерируем токен
       const user = await prisma.user.create({
         data: {
+          account: data?.account,  // установим поле account
           payments: {
             create: [{
               fromToken: data.from.tokenNameOrId,
