@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { sign, decode, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, PaymentStatus } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 import dayjs from 'dayjs';
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       // Создаем нового пользователя и генерируем токен
       const user = await prisma.user.create({
         data: {
-          account: data?.account,  // установим поле account
+          account: data.account,  // установим поле account
           payments: {
             create: [{
               fromToken: data.from.tokenNameOrId,
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
               recipientAddress: data.recipient.address,
               recipientEmail: data.recipient.email,
               ttl: ttl,
+              status: PaymentStatus.PENDING,  // установим статус по умолчанию
             }],
           },
         },
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
             recipientAddress: data.recipient.address,
             recipientEmail: data.recipient.email,
             ttl: ttl,
+            status: PaymentStatus.PENDING,  // установим статус по умолчанию
             user: {
               connect: { id: userId }
             }

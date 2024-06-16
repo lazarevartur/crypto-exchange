@@ -7,6 +7,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum PaymentStatus {
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
 model User {
   id       String    @id @default(uuid())
   account  String?
@@ -14,7 +20,7 @@ model User {
 }
 
 model Payment {
-  id               String   @id @default(uuid())
+  id               String        @id @default(uuid())
   fromToken        String
   fromAmount       String
   toToken          String
@@ -22,6 +28,7 @@ model Payment {
   recipientAddress String
   recipientEmail   String
   userId           String
-  user             User     @relation(fields: [userId], references: [id])
-  ttl              DateTime @default(now()) @map("ttl")
+  user             User          @relation(fields: [userId], references: [id])
+  ttl              DateTime      @default(now()) @map("ttl")
+  status           PaymentStatus @default(PENDING)
 }
