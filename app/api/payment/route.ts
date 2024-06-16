@@ -4,8 +4,9 @@ import { sign, decode, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
 import { PrismaClient, PaymentStatus } from "@prisma/client";
 import { z } from "zod";
-import type { NextRequest } from "next/server";
 import dayjs from 'dayjs';
+
+import type { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || "your-secret-key";
@@ -38,13 +39,15 @@ export async function POST(req: NextRequest) {
     const data = result.data;
     const token = req.cookies.get("token")?.value;
 
-    const ttl = dayjs().add(15, 'minute').toDate();  // Установка TTL на 15 минут вперед
+    const expiresIn = dayjs().add(15, 'minute').toDate();  // Установка expiresIn на 15 минут вперед
+    const createdAt = new Date();  // Установка текущей даты для createdAt
 
     if (!token) {
       // Создаем нового пользователя и генерируем токен
       const user = await prisma.user.create({
         data: {
           account: data.account,  // установим поле account
+          createdAt: createdAt,
           payments: {
             create: [{
               fromToken: data.from.tokenNameOrId,
@@ -53,7 +56,8 @@ export async function POST(req: NextRequest) {
               toAmount: data.to.amount,
               recipientAddress: data.recipient.address,
               recipientEmail: data.recipient.email,
-              ttl: ttl,
+              expiresIn: expiresIn,
+              createdAt: createdAt,
               status: PaymentStatus.PENDING,  // установим статус по умолчанию
             }],
           },
@@ -97,7 +101,8 @@ export async function POST(req: NextRequest) {
             toAmount: data.to.amount,
             recipientAddress: data.recipient.address,
             recipientEmail: data.recipient.email,
-            ttl: ttl,
+            expiresIn: expiresIn,
+            createdAt: createdAt,
             status: PaymentStatus.PENDING,  // установим статус по умолчанию
             user: {
               connect: { id: userId }

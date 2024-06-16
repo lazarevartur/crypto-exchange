@@ -14,9 +14,10 @@ enum PaymentStatus {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  account  String?
-  payments Payment[]
+  id        String    @id @default(uuid())
+  account   String?
+  payments  Payment[]
+  createdAt DateTime  @default(now()) @map("created_at")
 }
 
 model Payment {
@@ -29,6 +30,8 @@ model Payment {
   recipientEmail   String
   userId           String
   user             User          @relation(fields: [userId], references: [id])
-  ttl              DateTime      @default(now()) @map("ttl")
+  expiresIn        DateTime      @default(now()) @map("expires_in")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
 }
