@@ -1,0 +1,20 @@
+datasource db {
+  provider = "postgresql" // или другой провайдер, например, mysql
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String    @id @default(uuid())
+  payments Payment[]
+}
+
+model Payment {
+  id     String @id @default(uuid())
+  text   String
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
