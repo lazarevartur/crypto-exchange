@@ -6,19 +6,50 @@ import { PrismaClient } from "@prisma/client";
 import type { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
-const secret = "your-secret-key";
+const secret = process.env.JWT_SECRET || "your-secret-key";
 
+interface PaymentData {
+  from: {
+    tokenNameOrId: string;
+    amount: string;
+  };
+  to: {
+    tokenNameOrId: string;
+    amount: string;
+  };
+  recipient: {
+    address: string;
+    email: string;
+  };
+}
+
+// Обработка POST запросов для создания пользователя и платежей
 export async function POST(req: NextRequest) {
   try {
-    const { text } = await req.json();
+    const data: PaymentData = await req.json();
+
+    if (!data || !data.from || !data.to || !data.recipient ||
+        !data.from.tokenNameOrId || !data.from.amount ||
+        !data.to.tokenNameOrId || !data.to.amount ||
+        !data.recipient.address || !data.recipient.email) {
+      return NextResponse.json({ message: "Invalid input data" }, { status: 400 });
+    }
+
     const token = req.cookies.get("token")?.value;
 
     if (!token) {
-
+      // Создаем нового пользователя и генерируем токен
       const user = await prisma.user.create({
         data: {
           payments: {
-            create: [{ text }],
+            create: [{
+              fromToken: data.from.tokenNameOrId,
+              fromAmount: data.from.amount,
+              toToken: data.to.tokenNameOrId,
+              toAmount: data.to.amount,
+              recipientAddress: data.recipient.address,
+              recipientEmail: data.recipient.email
+            }],
           },
         },
       });
@@ -27,70 +58,82 @@ export async function POST(req: NextRequest) {
         expiresIn: "1d",
       });
 
-      const response = NextResponse.json({ message: "Set data with cookie" });
-
+      const response = NextResponse.json({ message: "User created and payment added", user });
       response.headers.append(
-        "Set-Cookie",
-        serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 60 * 60 * 24, // 1 day
-          path: "/",
-        }),
+          "Set-Cookie",
+          serialize("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24, // 1 day
+            path: "/",
+          })
       );
 
       return response;
     } else {
       const verifyToken = verify(token, secret) as JwtPayload;
 
-      if (verifyToken) {
+      if (verifyToken && verifyToken.userId) {
         const userId = verifyToken.userId;
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+        });
+
+        if (!user) {
+          return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
+
         await prisma.payment.create({
           data: {
-            text,
+            fromToken: data.from.tokenNameOrId,
+            fromAmount: data.from.amount,
+            toToken: data.to.tokenNameOrId,
+            toAmount: data.to.amount,
+            recipientAddress: data.recipient.address,
+            recipientEmail: data.recipient.email,
             userId,
           },
         });
 
-        return NextResponse.json(
-          { message: "Added new data" },
-          { status: 200 },
-        );
+        return NextResponse.json({ message: "Payment added successfully" }, { status: 200 });
       } else {
-        return NextResponse.json({ message: "Token error" }, { status: 403 });
+        return NextResponse.json({ message: "Invalid token" }, { status: 403 });
       }
     }
-  } catch (e) {
-    console.log("ERROR", e);
-    return NextResponse.json(
-      { message: "Validation data error" },
-      { status: 401 },
-    );
+  } catch (error) {
+    console.error("Error in POST /api/payment:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
 
+// Обработка GET запросов для проверки пользователя и получения его платежей
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  try {
+    const token = req.cookies.get("token")?.value;
 
-  if (token && verify(token, secret)) {
-    const decodedToken = decode(token) as JwtPayload;
-    const userId = decodedToken?.userId;
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { payments: true },
-    });
-
-
-    if (user) {
-      return NextResponse.json({ message: "user ID is valid", user });
-    } else {
-      return NextResponse.json(
-        { message: "Invalid user ID" },
-        { status: 404 },
-      );
+    if (!token) {
+      return NextResponse.json({ message: "Authentication required" }, { status: 401 });
     }
-  } else {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 403 });
+
+    const verifyToken = verify(token, secret) as JwtPayload;
+
+    if (verifyToken && verifyToken.userId) {
+      const userId = verifyToken.userId;
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { payments: true },
+      });
+
+      if (!user) {
+        return NextResponse.json({ message: "User not found" }, { status: 404 });
+      }
+
+      return NextResponse.json({ message: "User data retrieved successfully", user });
+    } else {
+      return NextResponse.json({ message: "Invalid token" }, { status: 403 });
+    }
+  } catch (error) {
+    console.error("Error in GET /api/payment:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

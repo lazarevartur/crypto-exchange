@@ -13,8 +13,13 @@ model User {
 }
 
 model Payment {
-  id     String @id @default(uuid())
-  text   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id               String @id @default(uuid())
+  fromToken        String
+  fromAmount       String
+  toToken          String
+  toAmount         String
+  recipientAddress String
+  recipientEmail   String
+  userId           String
+  user             User   @relation(fields: [userId], references: [id])
 }
