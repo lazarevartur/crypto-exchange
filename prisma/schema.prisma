@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql" // или другой провайдер, например, mysql
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum PaymentStatus {
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String    @id @default(uuid())
+  account   String?
+  payments  Payment[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  role      UserRole  @default(USER)
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  fromToken        String
+  fromAmount       String
+  toToken          String
+  toAmount         String
+  recipientAddress String
+  recipientEmail   String
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+  expiresIn        DateTime      @default(now()) @map("expires_in")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  closedIn         DateTime?     @map("closed_in")
+  status           PaymentStatus @default(PENDING)
+  approveStatus    PaymentStatus @default(PENDING)
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  name      String
+  symbol    String
+  imageUrl  String
+  amount    Float
+  price     Float
+  network   String
+  createdAt DateTime @default(now()) @map("created_at")
+}
