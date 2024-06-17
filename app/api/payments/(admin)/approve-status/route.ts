@@ -1,4 +1,4 @@
-// app/api/payment/approve-status/route.ts
+// app/api/payments/approve-status/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient, PaymentStatus } from "@prisma/client";
 import { z } from "zod";
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error in POST /api/payment/approve-status:", error);
+    console.error("Error in POST /api/payments/approve-status:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },

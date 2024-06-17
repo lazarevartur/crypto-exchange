@@ -42,3 +42,14 @@ model Payment {
   status           PaymentStatus @default(PENDING)
   approveStatus    PaymentStatus @default(PENDING)
 }
+
+model Token {
+  id        String   @id @default(uuid())
+  name      String
+  symbol    String
+  imageUrl  String
+  amount    Float
+  price     Float
+  network   String
+  createdAt DateTime @default(now()) @map("created_at")
+}

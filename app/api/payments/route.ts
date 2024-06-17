@@ -1,4 +1,4 @@
-// app/api/payment/route.ts
+// app/api/payments/route.ts
 import { NextResponse } from "next/server";
 import { sign, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       });
 
       const response = NextResponse.json({
-        message: "User created and payment added",
+        message: "User created and payments added",
         user,
       });
       response.headers.append(
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error) {
-    console.error("Error in POST /api/payment:", error);
+    console.error("Error in POST /api/payments:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },

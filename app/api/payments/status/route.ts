@@ -1,4 +1,4 @@
-// app/api/payment/status/route.ts
+// app/api/payments/status/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient, PaymentStatus } from "@prisma/client";
 import { z } from "zod";
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     if (payment.userId !== userId) {
       return NextResponse.json(
-        { message: "Forbidden: You do not own this payment" },
+        { message: "Forbidden: You do not own this payments" },
         { status: 403 },
       );
     }
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error in POST /api/payment/status:", error);
+    console.error("Error in POST /api/payments/status:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },
