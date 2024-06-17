@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { MockData } from "@/mock";
 import { CurrencySelect } from "@/components/exchage/CurrencySelect";
+import { useCreatePayment } from "@/http/mutation/useCreatePayment";
 
 const InputStyles: SystemStyleObject = {
   border: "0px",
@@ -120,6 +121,7 @@ const ExchangeRequest = () => {
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
+  const { mutate } = useCreatePayment();
 
   const titles = ["Создать заявку на обмен", "Введите реквизиты"];
 
@@ -141,6 +143,8 @@ const ExchangeRequest = () => {
         email: "kek@gmail.com",
       },
     };
+
+    mutate(data)
 
     alert(JSON.stringify(data, null, 2));
   };
