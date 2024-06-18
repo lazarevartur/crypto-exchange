@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 
-import type { IReserveItem } from "@/lib/types";
+import type { IReserveItem } from "@/lib/types/types";
 import { useTokens } from "@/http/query/tokens";
 import { useGetTags } from "@/http/query/tags";
 

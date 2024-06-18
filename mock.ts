@@ -1,5 +1,5 @@
 import { CATEGORIES } from "@/constants";
-import { IReserveItem } from "@/lib/types";
+import { IReserveItem } from "@/lib/types/types";
 
 function getRandomName() {
   const values = [

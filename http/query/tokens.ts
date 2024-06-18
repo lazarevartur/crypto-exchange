@@ -2,7 +2,7 @@ import { queryKeys } from "@/http/queryKeys";
 import { cryptoChangeService } from "@/http/services";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { IReserveItem } from "@/lib/types";
+import { IReserveItem } from "@/lib/types/types";
 
 export const useTokens = () => {
   const { data, error } = useQuery({

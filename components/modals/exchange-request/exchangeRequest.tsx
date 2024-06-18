@@ -14,15 +14,19 @@ import {
 import { useCreatePayment } from "@/http/mutation/useCreatePayment";
 import { FirstStep } from "@/components/exchage/ExchangeRequest/FirstStep";
 import { SecondStep } from "@/components/exchage/ExchangeRequest/SecondStep";
+import { useEffect } from "react";
+import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
+import { IPaymentRequest } from "@/lib/types/types";
 
 const steps = [FirstStep, SecondStep];
 
 const ExchangeRequest = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { activeStep, goToNext } = useSteps({
+  const { activeStep, goToNext, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
   });
+  const { from, to, amount, recipient, network } = useActiveChangeCurrency();
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
@@ -34,25 +38,32 @@ const ExchangeRequest = () => {
     if (!isLastStep) {
       goToNext();
     }
-    const data = {
-      from: {
-        tokenNameOrId: "BTC",
-        amount: "1",
-      },
-      to: {
-        tokenNameOrId: "AVAX",
-        amount: "2178",
-      },
-      recipient: {
-        address: "0xf45F49a56d981b05CA4d915f874693AC02044e0f",
-        email: "kek@gmail.com",
-      },
-    };
 
-    mutate(data);
+    if (isLastStep) {
+      const data: IPaymentRequest = {
+        from: {
+          amount: amount.from.toString(),
+          tokenNameOrId: from!.id,
+        },
+        to: {
+          amount: amount.to.toString(),
+          tokenNameOrId: to!.id,
+        },
+        recipient: {
+          address: recipient!.address,
+          email: recipient!.email,
+        },
+      };
 
-    alert(JSON.stringify(data, null, 2));
+      mutate(data);
+    }
   };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setActiveStep(0);
+    }
+  }, [isOpen]);
 
   return (
     <>
@@ -77,5 +88,4 @@ const ExchangeRequest = () => {
     </>
   );
 };
-
 export { ExchangeRequest };
