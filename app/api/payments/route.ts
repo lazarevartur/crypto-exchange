@@ -1,8 +1,8 @@
 // app/api/payments/route.ts
 import { NextResponse } from "next/server";
+import { PrismaClient, PaymentStatus, UserRole } from "@prisma/client";
 import { sign, verify, JwtPayload } from "jsonwebtoken";
 import { serialize } from "cookie";
-import { PrismaClient, PaymentStatus, UserRole } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 import dayjs from "dayjs";
@@ -55,9 +55,13 @@ export async function POST(req: NextRequest) {
           payments: {
             create: [
               {
-                fromToken: data.from.tokenNameOrId,
+                fromToken: {
+                  connect: { id: data.from.tokenNameOrId },
+                },
                 fromAmount: data.from.amount,
-                toToken: data.to.tokenNameOrId,
+                toToken: {
+                  connect: { id: data.to.tokenNameOrId },
+                },
                 toAmount: data.to.amount,
                 recipientAddress: data.recipient.address,
                 recipientEmail: data.recipient.email,
@@ -108,9 +112,13 @@ export async function POST(req: NextRequest) {
 
         await prisma.payment.create({
           data: {
-            fromToken: data.from.tokenNameOrId,
+            fromToken: {
+              connect: { id: data.from.tokenNameOrId },
+            },
             fromAmount: data.from.amount,
-            toToken: data.to.tokenNameOrId,
+            toToken: {
+              connect: { id: data.to.tokenNameOrId },
+            },
             toAmount: data.to.amount,
             recipientAddress: data.recipient.address,
             recipientEmail: data.recipient.email,

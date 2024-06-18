@@ -26,11 +26,26 @@ model User {
   role      UserRole  @default(USER)
 }
 
+model Token {
+  id               String    @id @default(uuid())
+  name             String    @unique
+  symbol           String    @unique
+  imageUrl         String
+  amount           Float
+  price            Float
+  network          String
+  createdAt        DateTime  @default(now()) @map("created_at")
+  PaymentTokenFrom Payment[] @relation("TokenFrom")
+  PaymentTokenTo   Payment[] @relation("TokenTo")
+}
+
 model Payment {
   id               String        @id @default(uuid())
-  fromToken        String
+  fromTokenId      String
+  fromToken        Token         @relation("TokenFrom", fields: [fromTokenId], references: [id])
   fromAmount       String
-  toToken          String
+  toTokenId        String
+  toToken          Token         @relation("TokenTo", fields: [toTokenId], references: [id])
   toAmount         String
   recipientAddress String
   recipientEmail   String
@@ -41,15 +56,4 @@ model Payment {
   closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
   approveStatus    PaymentStatus @default(PENDING)
-}
-
-model Token {
-  id        String   @id @default(uuid())
-  name      String
-  symbol    String
-  imageUrl  String
-  amount    Float
-  price     Float
-  network   String
-  createdAt DateTime @default(now()) @map("created_at")
 }
