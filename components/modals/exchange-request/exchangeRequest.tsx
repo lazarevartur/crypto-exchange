@@ -1,9 +1,6 @@
 "use client";
 import {
   Button,
-  Checkbox,
-  Flex,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,111 +8,19 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Radio,
-  RadioGroup,
-  Stack,
-  SystemStyleObject,
-  Text,
   useDisclosure,
   useSteps,
 } from "@chakra-ui/react";
-import { MockData } from "@/mock";
-import { CurrencySelect } from "@/components/exchage/CurrencySelect";
 import { useCreatePayment } from "@/http/mutation/useCreatePayment";
-
-const InputStyles: SystemStyleObject = {
-  border: "0px",
-  borderBottom: "1px",
-  borderRadius: "none",
-  borderColor: "#0500ff",
-  pl: "0px",
-  textAlign: "center",
-  color: "#212121",
-  fontWeight: 600,
-  fontSize: "24px",
-  _hover: { borderColor: "#0500ff" },
-  _focusVisible: {
-    boxShadow: "none",
-  },
-};
-
-const SelectNetwork = () => (
-  <RadioGroup defaultValue="1" colorScheme="yellow">
-    <Stack spacing={5} direction="row">
-      <Radio value="1">Omni</Radio>
-      <Radio value="2">Bep - 20</Radio>
-    </Stack>
-  </RadioGroup>
-);
-
-const FirstStep = () => (
-  <>
-    <Flex flexDir="column">
-      <Flex flexDir="column" gap="10px">
-        <CurrencySelect options={MockData} />
-        <Input type="number" sx={InputStyles} defaultValue={0} />
-      </Flex>
-      <Flex
-        flexDir="column"
-        my="35px"
-        alignItems="center"
-        fontSize="14px"
-        color="#737373"
-      >
-        <Text>Скидка: 0 % (0.00 RUB)</Text>
-        <Text>Минимум: 30000 Максимум: 900000</Text>
-      </Flex>
-      <Flex flexDir="column" gap="10px">
-        <CurrencySelect options={MockData} />
-        <Input type="number" sx={InputStyles} defaultValue={0} />
-      </Flex>
-    </Flex>
-    <Flex w="100%" mt="20px" justifyContent="center">
-      <SelectNetwork />
-    </Flex>
-  </>
-);
-
-const SecondStepInputGroutStyles: SystemStyleObject = {
-  flexDir: "column",
-  fontSize: "16px",
-  fontWeight: 600,
-  color: "black",
-  gap: "10px",
-  input: {
-    h: "56px",
-    bg: "rgba(227, 227, 227, .4)",
-    borderRadius: "7px",
-  },
-};
-
-const SecondStep = () => (
-  <Flex flexDir="column" gap="35px">
-    <Flex sx={SecondStepInputGroutStyles}>
-      <Text>Реквизиты получателя:</Text>
-      <Input />
-    </Flex>
-    <Flex sx={SecondStepInputGroutStyles}>
-      <Text>E-mail:</Text>
-      <Input />
-    </Flex>
-    <Flex flexDir="column">Есть промокод?</Flex>
-    <Checkbox defaultChecked>
-      <Text fontSize="14px">
-        {" "}
-        Вы соглашаетесь с правилами сервиса и регламентом проведения
-        AML-проверок
-      </Text>
-    </Checkbox>
-  </Flex>
-);
+import { FirstStep } from "@/components/exchage/ExchangeRequest/FirstStep";
+import { SecondStep } from "@/components/exchage/ExchangeRequest/SecondStep";
 
 const steps = [FirstStep, SecondStep];
 
 const ExchangeRequest = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { activeStep, goToNext } = useSteps({
-    index: 1,
+    index: 0,
     count: steps.length,
   });
 
@@ -144,7 +49,7 @@ const ExchangeRequest = () => {
       },
     };
 
-    mutate(data)
+    mutate(data);
 
     alert(JSON.stringify(data, null, 2));
   };
@@ -154,8 +59,7 @@ const ExchangeRequest = () => {
       <Button h="60px" bg="#fcbf11" onClick={onOpen}>
         Обменять
       </Button>
-
-      <Modal onClose={onClose} isOpen={isOpen}>
+      <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{titles[activeStep]}</ModalHeader>
