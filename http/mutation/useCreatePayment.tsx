@@ -1,6 +1,6 @@
 import {useMutation} from "@tanstack/react-query";
-import {cryptoChangeApi} from "@/http/services";
+import {cryptoChangeService} from "@/http/services";
 
 export const useCreatePayment = () => useMutation({
-  mutationFn: cryptoChangeApi.createPayment
+  mutationFn: cryptoChangeService.createPayment
 })

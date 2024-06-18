@@ -33,10 +33,12 @@ function getRandomCategories() {
   return shuffledCategories.slice(0, numberOfCategories);
 }
 
-export const MockData = Array.from({ length: 34 }).map<IReserveItem>((_, i) => ({
-  id: i.toString(),
-  name: getRandomName(),
-  amount: getRandomNumber(),
-  icon: "/btc.svg",
-  type: getRandomCategories(),
-}));
+export const MockData = Array.from({ length: 34 }).map<IReserveItem>(
+  (_, i) => ({
+    id: i.toString(),
+    name: getRandomName(),
+    amount: getRandomNumber(),
+    icon: "/btc.svg",
+    type: getRandomCategories(),
+  }),
+);

@@ -1,3 +1,4 @@
+"use client";
 import {
   Container,
   Flex,
@@ -17,6 +18,7 @@ import { CATEGORIES } from "@/constants";
 import { MockData } from "@/mock";
 
 import type { IReserveItem } from "@/lib/types";
+import { useTokens } from "@/http/query/useTokens";
 
 const Tab = (props: TabProps) => (
   <ChakraTab
@@ -90,6 +92,8 @@ const ReserveItemsList = ({
 };
 
 const CryptoReserves = () => {
+  const { prepareTokens } = useTokens();
+  const tokens = useMemo(() => prepareTokens(), [prepareTokens]);
   return (
     <Container as="section" maxW="container.xl" py="44px">
       <Heading
@@ -110,14 +114,17 @@ const CryptoReserves = () => {
           ))}
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <ReserveItemsList data={MockData} />
-          </TabPanel>
-          {CATEGORIES.map((item) => (
-            <TabPanel key={item}>
-              <ReserveItemsList data={MockData} filterBy={item} />
+          {/*<TabPanel>*/}
+          {/*  <ReserveItemsList data={MockData} />*/}
+          {/*</TabPanel>*/}
+            <TabPanel >
+              <ReserveItemsList data={tokens} />
             </TabPanel>
-          ))}
+          {/*{CATEGORIES.map((item) => (*/}
+          {/*  <TabPanel key={item}>*/}
+          {/*    <ReserveItemsList data={MockData} filterBy={item} />*/}
+          {/*  </TabPanel>*/}
+          {/*))}*/}
         </TabPanels>
       </Tabs>
     </Container>
