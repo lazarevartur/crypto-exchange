@@ -37,6 +37,7 @@ model Token {
   createdAt        DateTime  @default(now()) @map("created_at")
   PaymentTokenFrom Payment[] @relation("TokenFrom")
   PaymentTokenTo   Payment[] @relation("TokenTo")
+  tags             String[]
 }
 
 model Payment {
@@ -56,4 +57,10 @@ model Payment {
   closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
   approveStatus    PaymentStatus @default(PENDING)
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
 }

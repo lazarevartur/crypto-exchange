@@ -13,24 +13,13 @@ export const useTokens = () => {
   const prepareTokens = useCallback(
     () =>
       data
-        ? data.map<IReserveItem>(
-            ({
-              id,
-              amount,
-              price,
-              network,
-              createdAt,
-              symbol,
-              imageUrl,
-              name,
-            }) => ({
-              name,
-              amount,
-              id,
-              type: [""],
-              icon: imageUrl,
-            }),
-          )
+        ? data.map<IReserveItem>(({ id, amount, imageUrl, name, tags }) => ({
+            name,
+            amount,
+            id,
+            type: tags,
+            icon: imageUrl,
+          }))
         : [],
     [data],
   );

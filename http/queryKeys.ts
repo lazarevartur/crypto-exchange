@@ -1,1 +1,1 @@
-export const queryKeys = { useTokens: "useTokens" };
+export const queryKeys = { useTokens: "useTokens", useGetTags: 'useGetTags' };

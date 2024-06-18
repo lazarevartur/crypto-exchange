@@ -1,9 +1,14 @@
+"use client";
 import { Box, Container, Flex, Heading, Text } from "@chakra-ui/react";
 import { CurrencySelect } from "@/components/exchage/CurrencySelect";
-import { MockData } from "@/mock";
 import { ExchangeRequest } from "@/components/modals";
+import { useTokens } from "@/http/query/tokens";
+import { useMemo } from "react";
 
 const CryptoExchange = () => {
+  const { prepareTokens } = useTokens();
+  const tokens = useMemo(() => prepareTokens(), [prepareTokens]);
+
   return (
     <Box color="white" bg="#0f0965" maxH="300px" w="100%">
       <Container
@@ -22,10 +27,10 @@ const CryptoExchange = () => {
         </Text>
         <Flex gap="1px">
           <Box w="350px">
-            <CurrencySelect options={MockData} />
+            <CurrencySelect options={tokens} />
           </Box>
           <Box w="350px">
-            <CurrencySelect options={MockData} />
+            <CurrencySelect options={tokens} />
           </Box>
 
           <ExchangeRequest />

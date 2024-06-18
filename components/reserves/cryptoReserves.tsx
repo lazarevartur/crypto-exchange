@@ -14,11 +14,9 @@ import {
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 
-import { CATEGORIES } from "@/constants";
-import { MockData } from "@/mock";
-
 import type { IReserveItem } from "@/lib/types";
-import { useTokens } from "@/http/query/useTokens";
+import { useTokens } from "@/http/query/tokens";
+import { useGetTags } from "@/http/query/tags";
 
 const Tab = (props: TabProps) => (
   <ChakraTab
@@ -93,7 +91,10 @@ const ReserveItemsList = ({
 
 const CryptoReserves = () => {
   const { prepareTokens } = useTokens();
+  const { prepareTags } = useGetTags();
+  const categories = useMemo(() => prepareTags(), [prepareTags]);
   const tokens = useMemo(() => prepareTokens(), [prepareTokens]);
+
   return (
     <Container as="section" maxW="container.xl" py="44px">
       <Heading
@@ -109,22 +110,19 @@ const CryptoReserves = () => {
       <Tabs variant="unstyled">
         <TabList gap="8px" mb="16px">
           <Tab>all</Tab>
-          {CATEGORIES.map((item) => (
-            <Tab key={item}>{item}</Tab>
+          {categories.map((item, i) => (
+            <Tab key={i}>{item}</Tab>
           ))}
         </TabList>
         <TabPanels>
-          {/*<TabPanel>*/}
-          {/*  <ReserveItemsList data={MockData} />*/}
-          {/*</TabPanel>*/}
-            <TabPanel >
-              <ReserveItemsList data={tokens} />
+          <TabPanel>
+            <ReserveItemsList data={tokens} />
+          </TabPanel>
+          {categories.map((item, i) => (
+            <TabPanel key={i}>
+              <ReserveItemsList data={tokens} filterBy={item} />
             </TabPanel>
-          {/*{CATEGORIES.map((item) => (*/}
-          {/*  <TabPanel key={item}>*/}
-          {/*    <ReserveItemsList data={MockData} filterBy={item} />*/}
-          {/*  </TabPanel>*/}
-          {/*))}*/}
+          ))}
         </TabPanels>
       </Tabs>
     </Container>

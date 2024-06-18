@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ITokenResponse } from "@/lib/types/http/Token";
+import { Tag, Token } from "@prisma/client";
 
 const httpClient = axios.create({
   baseURL: "/api",
@@ -14,7 +14,12 @@ export const cryptoChangeService = {
     const { data } = await httpClient.post("/api/payments", body);
   },
   getAllTokens: async () => {
-    const { data } = await httpClient.get<ITokenResponse>("/tokens");
+    const { data } = await httpClient.get<Token[]>("/tokens");
+
+    return data;
+  },
+  getAllTokenTags: async () => {
+    const { data } = await httpClient.get<Tag[]>("/tags");
 
     return data;
   },
