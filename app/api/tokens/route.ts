@@ -42,6 +42,20 @@ export async function POST(req: NextRequest) {
 
     const { name, symbol, imageUrl, amount, price, network } = result.data;
 
+    // Проверка уникальности name и symbol
+    const existingToken = await prisma.token.findFirst({
+      where: {
+        OR: [{ name: name }, { symbol: symbol }],
+      },
+    });
+
+    if (existingToken) {
+      return NextResponse.json(
+        { message: "Token with the same name or symbol already exists" },
+        { status: 409 },
+      );
+    }
+
     const token = await prisma.token.create({
       data: {
         name,
@@ -70,9 +84,12 @@ export async function GET(req: NextRequest) {
   try {
     const tokens = await prisma.token.findMany();
 
-    return NextResponse.json({ message: "Tokens retrieved successfully", tokens }, { status: 200 });
+    return NextResponse.json(tokens, { status: 200 });
   } catch (error) {
     console.error("Error in GET /api/tokens:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

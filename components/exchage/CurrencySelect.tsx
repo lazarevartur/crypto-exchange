@@ -24,7 +24,7 @@ import {
   useRadioGroup,
   UseRadioProps,
 } from "@chakra-ui/react";
-import { IReserveItem } from "@/lib/types";
+import { IReserveItem } from "@/lib/types/types";
 import { CATEGORIES } from "@/constants";
 
 interface IMenuListDefaultProps
@@ -227,7 +227,15 @@ const Control: FC<ControlProps<IReserveItem>> = (props) => {
   );
 };
 
-export const CurrencySelect = ({ options }: { options: IReserveItem[] }) => {
+export const CurrencySelect = ({
+  options,
+  onChange,
+  defaultValue,
+}: {
+  options: IReserveItem[];
+  defaultValue?: IReserveItem;
+  onChange?: (item: IReserveItem) => void;
+}) => {
   const id = useId();
   const ref = useRef(null);
 
@@ -257,10 +265,13 @@ export const CurrencySelect = ({ options }: { options: IReserveItem[] }) => {
         menuIsOpen
         toggleMenu={onToggle}
         options={options}
+        defaultValue={defaultValue}
         placeholder="Search your token"
         instanceId={id}
         classNamePrefix="currencySelect"
         chakraStyles={styles}
+        // @ts-ignore
+        onChange={onChange}
         // @ts-ignore
         filterOption={createFilter(filterConfig)}
         // @ts-ignore

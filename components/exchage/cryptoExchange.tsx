@@ -1,24 +1,23 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+"use client";
+import { Box, Container, Flex, Heading, Text } from "@chakra-ui/react";
 import { CurrencySelect } from "@/components/exchage/CurrencySelect";
-import { MockData } from "@/mock";
 import { ExchangeRequest } from "@/components/modals";
+import { useTokens } from "@/http/query/tokens";
+import { useMemo } from "react";
+import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
+import { IReserveItem } from "@/lib/types/types";
 
 const CryptoExchange = () => {
+  const { prepareTokens } = useTokens();
+  const tokens = useMemo(() => prepareTokens(), [prepareTokens]);
+
+  const setActiveCurrency = useActiveChangeCurrency(
+    (state) => state.setActiveCurrency,
+  );
+
+  const onChangeHandler = (direction: "from" | "to") => (item: IReserveItem) =>
+    setActiveCurrency({ direction, ...item });
+
   return (
     <Box color="white" bg="#0f0965" maxH="300px" w="100%">
       <Container
@@ -37,10 +36,13 @@ const CryptoExchange = () => {
         </Text>
         <Flex gap="1px">
           <Box w="350px">
-            <CurrencySelect options={MockData} />
+            <CurrencySelect
+              options={tokens}
+              onChange={onChangeHandler("from")}
+            />
           </Box>
           <Box w="350px">
-            <CurrencySelect options={MockData} />
+            <CurrencySelect options={tokens} onChange={onChangeHandler("to")} />
           </Box>
 
           <ExchangeRequest />
