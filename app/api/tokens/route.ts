@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
+import cache from "@/app/api/_services/cache";
 import { authenticateUser, authorizeAdmin } from "@/app/api/_utils/utils";
 
 const prisma = new PrismaClient();
@@ -35,8 +36,8 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { message: "Invalid input data", errors: result.error.errors },
-        { status: 400 },
+          { message: "Invalid input data", errors: result.error.errors },
+          { status: 400 },
       );
     }
 
@@ -51,8 +52,8 @@ export async function POST(req: NextRequest) {
 
     if (existingToken) {
       return NextResponse.json(
-        { message: "Token with the same name or symbol already exists" },
-        { status: 409 },
+          { message: "Token with the same name or symbol already exists" },
+          { status: 409 },
       );
     }
 
@@ -67,29 +68,53 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Инвалидация кэша после создания нового токена
+    cache.del("tokens");
+    cache.del("tags");
+
     return NextResponse.json(
-      { message: "Token created successfully", token },
-      { status: 201 },
+        { message: "Token created successfully", token },
+        { status: 201 },
     );
   } catch (error) {
     console.error("Error in POST /api/tokens:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
+        { message: "Internal server error" },
+        { status: 500 },
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
+    // Попытка получить данные из кэша
+    const cachedTokens = cache.get("tokens");
+    if (cachedTokens) {
+      return NextResponse.json(
+          cachedTokens,
+          { status: 200 },
+      );
+    }
+
+    // Получение всех токенов из базы данных
     const tokens = await prisma.token.findMany();
 
-    return NextResponse.json(tokens, { status: 200 });
+    // Сохранение в кэш
+    cache.set("tokens", tokens);
+
+    return NextResponse.json(
+        tokens,
+        { status: 200 },
+    );
   } catch (error) {
     console.error("Error in GET /api/tokens:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
+        { message: "Internal server error" },
+        { status: 500 },
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
