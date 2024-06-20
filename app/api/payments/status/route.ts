@@ -59,13 +59,7 @@ export async function POST(req: NextRequest) {
       data: { status: status },
     });
 
-    return NextResponse.json(
-      {
-        message: "Payment status updated successfully",
-        payment: updatedPayment,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json(updatedPayment, { status: 200 });
   } catch (error) {
     console.error("Error in POST /api/payments/status:", error);
     return NextResponse.json(

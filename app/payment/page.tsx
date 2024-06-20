@@ -1,16 +1,48 @@
 "use client";
 import { Button, Card, Container, Flex, Spinner, Text } from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePaymentById } from "@/http/query/payment";
 import dayjs from "dayjs";
 import { useUpdatePaymentStatus } from "@/http/mutation/paymentMutation";
+import Countdown from "react-countdown";
+
+const renderer = ({
+  minutes,
+  seconds,
+  completed,
+}: {
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+}) => {
+  if (completed) {
+    return <Text>Время вышло</Text>;
+  } else {
+    return (
+      <Flex alignItems="center" gap="15px" justifyContent="space-evenly">
+        <Text>
+          {minutes}:{seconds}
+        </Text>
+        <Spinner
+          thickness="6px"
+          speed="1s"
+          emptyColor="gray.200"
+          color="rgb(6, 1, 255)"
+          size="xl"
+        />
+      </Flex>
+    );
+  }
+};
+
 
 export default function PaymentPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const router = useRouter();
 
-  const { mutate } = useUpdatePaymentStatus();
+  const { mutate, isPending } = useUpdatePaymentStatus();
 
   const { payment } = usePaymentById(id);
   const fromDate = dayjs(payment?.createdAt).format("DD.MM.YYYY");
@@ -22,6 +54,14 @@ export default function PaymentPage() {
   const onRejectHandler = () => {
     id && mutate({ paymentId: id, status: "REJECTED" });
   };
+
+  if (!payment) {
+    return null;
+  }
+
+  if (payment.status === "ACCEPTED") {
+    router.push(`/ticket?id=${id}`);
+  }
 
   return (
     <Container
@@ -49,9 +89,9 @@ export default function PaymentPage() {
             color="#212121"
           >
             <Text>
-              Вы меняете {payment?.fromAmount} {payment?.fromToken.name}{" "}
-              {payment?.fromToken.symbol} на {payment?.toAmount}{" "}
-              {payment?.toToken.name} {payment?.toToken.symbol}
+              Вы меняете {payment?.fromAmount} {payment?.fromToken?.name}{" "}
+              {payment?.fromToken?.symbol} на {payment?.toAmount}{" "}
+              {payment?.toToken?.name} {payment?.toToken?.symbol}
             </Text>
             <Text>
               Получаете на:{" "}
@@ -68,16 +108,10 @@ export default function PaymentPage() {
         </Card>
 
         <Flex flexDir="column" gap="15px" justifyContent="center">
-          <Flex alignItems="center" gap="15px">
-            <Text>15:00</Text>
-            <Spinner
-              thickness="6px"
-              speed="1s"
-              emptyColor="gray.200"
-              color="rgb(6, 1, 255)"
-              size="xl"
-            />
-          </Flex>
+          <Countdown
+            renderer={renderer}
+            date={new Date(payment?.expiresIn).getTime()}
+          />
           <Text fontSize="14px" w="150px">
             Оплатите заявку до окончания этого времени
           </Text>
@@ -103,7 +137,7 @@ export default function PaymentPage() {
           <Text>
             Для совершения обмена Вам необходимо перевести{" "}
             <Text as="span" fontWeight={600}>
-              {payment?.fromAmount} {payment?.fromToken.symbol}
+              {payment?.fromAmount} {payment?.fromToken?.symbol}
             </Text>{" "}
             на реквизиты.
           </Text>
@@ -114,8 +148,8 @@ export default function PaymentPage() {
             </Text>
           </Flex>
           <Flex gap="10px">
-            <Button onClick={onAcceptHandler}>Я оплатил</Button>
-            <Button onClick={onRejectHandler}>Отмена</Button>
+            <Button onClick={onAcceptHandler} isLoading={isPending}>Я оплатил</Button>
+            <Button onClick={onRejectHandler} isLoading={isPending}>Отмена</Button>
           </Flex>
         </Flex>
       </Card>

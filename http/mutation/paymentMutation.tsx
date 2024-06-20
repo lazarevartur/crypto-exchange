@@ -1,5 +1,5 @@
 import { cryptoChangeService } from "@/http/services";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/http/queryKeys";
 
 export const useCreatePayment = () =>
@@ -8,8 +8,16 @@ export const useCreatePayment = () =>
     mutationKey: [queryKeys.useCreatePayment],
   });
 
-export const useUpdatePaymentStatus = () =>
-  useMutation({
+export const useUpdatePaymentStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: cryptoChangeService.updatePaymentStatus,
     mutationKey: [queryKeys.updatePaymentStatus],
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.usePaymentById, variables.paymentId],
+      });
+    },
   });
+};

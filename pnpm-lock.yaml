@@ -23,6 +23,9 @@ dependencies:
   '@tanstack/react-query':
     specifier: ^5.45.1
     version: 5.45.1(react@18.3.1)
+  '@tanstack/react-query-devtools':
+    specifier: ^5.45.1
+    version: 5.45.1(@tanstack/react-query@5.45.1)(react@18.3.1)
   axios:
     specifier: ^1.7.2
     version: 1.7.2
@@ -56,6 +59,9 @@ dependencies:
   react:
     specifier: ^18
     version: 18.3.1
+  react-countdown:
+    specifier: ^2.3.5
+    version: 2.3.5(react-dom@18.3.1)(react@18.3.1)
   react-dom:
     specifier: ^18
     version: 18.3.1(react@18.3.1)
@@ -1752,6 +1758,21 @@ packages:
 
   /@tanstack/query-core@5.45.0:
     resolution: {integrity: sha512-RVfIZQmFUTdjhSAAblvueimfngYyfN6HlwaJUPK71PKd7yi43Vs1S/rdimmZedPWX/WGppcq/U1HOj7O7FwYxw==}
+    dev: false
+
+  /@tanstack/query-devtools@5.37.1:
+    resolution: {integrity: sha512-XcG4IIHIv0YQKrexTqo2zogQWR1Sz672tX2KsfE9kzB+9zhx44vRKH5si4WDILE1PIWQpStFs/NnrDQrBAUQpg==}
+    dev: false
+
+  /@tanstack/react-query-devtools@5.45.1(@tanstack/react-query@5.45.1)(react@18.3.1):
+    resolution: {integrity: sha512-4mrbk1g5jqlqh0pifZNsKzy7FtgeqgwzMICL4d6IJGayrrcrKq9K4N/OzRNbgRWrTn6YTY63qcAcKo+NJU2QMw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.45.1
+      react: ^18 || ^19
+    dependencies:
+      '@tanstack/query-devtools': 5.37.1
+      '@tanstack/react-query': 5.45.1(react@18.3.1)
+      react: 18.3.1
     dev: false
 
   /@tanstack/react-query@5.45.1(react@18.3.1):
@@ -3969,6 +3990,17 @@ packages:
     dependencies:
       '@babel/runtime': 7.24.7
       react: 18.3.1
+    dev: false
+
+  /react-countdown@2.3.5(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-K26ENYEesMfPxhRRtm1r+Pf70SErrvW3g4CArLi/x6MPFjgfDFYePT4UghEj8p2nI0cqVV7/JjDgjyr//U60Og==}
+    peerDependencies:
+      react: '>= 15'
+      react-dom: '>= 15'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):

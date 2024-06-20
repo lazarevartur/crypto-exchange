@@ -1,37 +1,13 @@
-import {
-  MutationState,
-  useMutationState,
-  useQuery,
-} from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/http/queryKeys";
 import { cryptoChangeService } from "@/http/services";
-import { IPayloadResponse } from "@/lib/types/Payload";
 
 export const usePaymentById = (id: string | null) => {
-  const paymentsMutationState = useMutationState<
-    MutationState<IPayloadResponse>
-  >({
-    filters: { mutationKey: ["useCreatePayment"] },
-  });
-  const paymentFromState = useMemo(
-    () =>
-      paymentsMutationState
-        .map((item) => item.data)
-        .find((payment) => payment?.id === id),
-    [paymentsMutationState, id],
-  );
-
-  const { data, ...rest } = useQuery({
-    queryKey: [queryKeys.usePaymentById],
+  const { data: payment, ...rest } = useQuery({
+    queryKey: [queryKeys.usePaymentById, id],
     queryFn: () => cryptoChangeService.getPaymentById(id!),
-    enabled: !!id && !paymentFromState,
+    enabled: !!id,
   });
-
-  const payment = useMemo(
-    () => (paymentFromState ? paymentFromState : data),
-    [data, paymentFromState],
-  );
 
   return { payment, ...rest };
 };
