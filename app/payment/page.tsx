@@ -1,7 +1,17 @@
+"use client";
 import { Button, Card, Container, Flex, Spinner, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { usePaymentById } from "@/http/query/payment";
+import dayjs from "dayjs";
 
 export default function PaymentPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const { payment } = usePaymentById(id);
+  const fromDate = dayjs(payment?.createdAt).format("DD.MM.YYYY");
+
   return (
     <Container
       as="section"
@@ -13,7 +23,9 @@ export default function PaymentPage() {
     >
       <Flex gap="15px" fontSize="18px">
         <Text>Ожидание оплаты</Text>
-        <Text fontWeight={600}> №191813 от 15.06.2024</Text>
+        <Text fontWeight={600}>
+          №{payment?.id} от {fromDate}
+        </Text>
       </Flex>
       <Flex gap="50px">
         <Card padding="16px" maxW="450px">
@@ -26,12 +38,14 @@ export default function PaymentPage() {
             color="#212121"
           >
             <Text>
-              Вы меняете 37,21872 Binance Coin BNB на 0,33902474 Bitcoin BTC
+              Вы меняете {payment?.fromAmount} {payment?.fromToken.name}{" "}
+              {payment?.fromToken.symbol} на {payment?.toAmount}{" "}
+              {payment?.toToken.name} {payment?.toToken.symbol}
             </Text>
             <Text>
               Получаете на:{" "}
               <Text color="#fcbf11">
-                0xf45F49a56d981b05CA4d915f874693AC02044e0f
+                {payment?.recipientAddress}
               </Text>
             </Text>
             <Text>Политика AML / KYC</Text>
@@ -80,9 +94,9 @@ export default function PaymentPage() {
           <Text>
             Для совершения обмена Вам необходимо перевести{" "}
             <Text as="span" fontWeight={600}>
-              37,21872 BNB
+              {payment?.fromAmount} {payment?.fromToken.symbol}
             </Text>{" "}
-            на реквизиты
+            на реквизиты.
           </Text>
           <Flex flexDir="column" fontSize="16px">
             <Text fontWeight={600}>Адрес получения:</Text>

@@ -17,10 +17,13 @@ import { SecondStep } from "@/components/exchage/ExchangeRequest/SecondStep";
 import { useEffect } from "react";
 import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
 import { IPaymentRequest } from "@/lib/types/types";
+import { useRouter } from "next/navigation";
 
 const steps = [FirstStep, SecondStep];
+const titles = ["Создать заявку на обмен", "Введите реквизиты"];
 
 const ExchangeRequest = () => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { activeStep, goToNext, setActiveStep } = useSteps({
     index: 0,
@@ -30,11 +33,7 @@ const ExchangeRequest = () => {
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
-  const { mutate,  } = useCreatePayment();
-
-  console.log(data)
-
-  const titles = ["Создать заявку на обмен", "Введите реквизиты"];
+  const { mutate, data, isPending } = useCreatePayment();
 
   const onClickHandler = () => {
     if (!isLastStep) {
@@ -63,6 +62,12 @@ const ExchangeRequest = () => {
   };
 
   useEffect(() => {
+    if (data?.id) {
+      router.push(`/payment?id=${data?.id}`);
+    }
+  }, [data]);
+
+  useEffect(() => {
     if (!isOpen) {
       setActiveStep(0);
     }
@@ -82,7 +87,12 @@ const ExchangeRequest = () => {
             <ActiveStepComponent />
           </ModalBody>
           <ModalFooter>
-            <Button bg="#fcbf11" w="100%" onClick={onClickHandler}>
+            <Button
+              bg="#fcbf11"
+              w="100%"
+              onClick={onClickHandler}
+              isLoading={isPending}
+            >
               Продолжить
             </Button>
           </ModalFooter>

@@ -77,16 +77,16 @@ export async function POST(req: NextRequest) {
             ],
           },
         },
+        include: {
+          payments: true,
+        },
       });
 
       const token = sign({ userId: user.id }, secret, {
         expiresIn: "1d",
       });
 
-      const response = NextResponse.json({
-        message: "User created and payments added",
-        user,
-      });
+      const response = NextResponse.json(user.payments[0]);
       response.headers.append(
           "Set-Cookie",
           serialize("token", token, {
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        await prisma.payment.create({
+        const payment = await prisma.payment.create({
           // @ts-ignore
           data: {
             fromToken: {
@@ -135,13 +135,10 @@ export async function POST(req: NextRequest) {
             user: {
               connect: { id: userId },
             },
-          },
+          }
         });
 
-        return NextResponse.json(
-            { message: "Payment added successfully" },
-            { status: 200 },
-        );
+        return NextResponse.json(payment, { status: 200 });
       } else {
         return NextResponse.json({ message: "Invalid token" }, { status: 403 });
       }
@@ -171,6 +168,10 @@ export async function GET(req: NextRequest) {
       // Получение платежа по ID
       const payment = await prisma.payment.findUnique({
         where: { id: paymentId },
+        include: {
+          fromToken: true,
+          toToken: true,
+        },
       });
 
       if (!payment) {
@@ -180,10 +181,7 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      return NextResponse.json(
-          { message: "Payment retrieved successfully", payment },
-          { status: 200 },
-      );
+      return NextResponse.json(payment, { status: 200 });
     }
 
     if (
@@ -197,19 +195,20 @@ export async function GET(req: NextRequest) {
     }
 
     const status = statusParam as PaymentStatus;
-    console.log({userId})
+
     // Получение всех платежей по userId и статусу
     const payments = await prisma.payment.findMany({
       where: {
         userId: userId,
         ...(status && { status: status }),
       },
+      include: {
+        fromToken: true,
+        toToken: true,
+      },
     });
 
-    return NextResponse.json(
-        { message: "Payments retrieved successfully", payments },
-        { status: 200 },
-    );
+    return NextResponse.json(payments, { status: 200 });
   } catch (error) {
     console.error("Error in GET /api/payments:", error);
     return NextResponse.json(
