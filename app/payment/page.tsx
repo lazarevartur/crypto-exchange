@@ -4,13 +4,24 @@ import React, { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePaymentById } from "@/http/query/payment";
 import dayjs from "dayjs";
+import { useUpdatePaymentStatus } from "@/http/mutation/paymentMutation";
 
 export default function PaymentPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
+  const { mutate } = useUpdatePaymentStatus();
+
   const { payment } = usePaymentById(id);
   const fromDate = dayjs(payment?.createdAt).format("DD.MM.YYYY");
+
+  const onAcceptHandler = () => {
+    id && mutate({ paymentId: id, status: "ACCEPTED" });
+  };
+
+  const onRejectHandler = () => {
+    id && mutate({ paymentId: id, status: "REJECTED" });
+  };
 
   return (
     <Container
@@ -44,9 +55,7 @@ export default function PaymentPage() {
             </Text>
             <Text>
               Получаете на:{" "}
-              <Text color="#fcbf11">
-                {payment?.recipientAddress}
-              </Text>
+              <Text color="#fcbf11">{payment?.recipientAddress}</Text>
             </Text>
             <Text>Политика AML / KYC</Text>
             <Text fontSize="14px">
@@ -105,8 +114,8 @@ export default function PaymentPage() {
             </Text>
           </Flex>
           <Flex gap="10px">
-            <Button>Я оплатил</Button>
-            <Button>Отмена</Button>
+            <Button onClick={onAcceptHandler}>Я оплатил</Button>
+            <Button onClick={onRejectHandler}>Отмена</Button>
           </Flex>
         </Flex>
       </Card>

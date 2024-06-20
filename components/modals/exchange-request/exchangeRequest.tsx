@@ -11,13 +11,14 @@ import {
   useDisclosure,
   useSteps,
 } from "@chakra-ui/react";
-import { useCreatePayment } from "@/http/mutation/useCreatePayment";
+
 import { FirstStep } from "@/components/exchage/ExchangeRequest/FirstStep";
 import { SecondStep } from "@/components/exchage/ExchangeRequest/SecondStep";
 import { useEffect } from "react";
 import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
 import { IPaymentRequest } from "@/lib/types/types";
 import { useRouter } from "next/navigation";
+import { useCreatePayment } from "@/http/mutation/paymentMutation";
 
 const steps = [FirstStep, SecondStep];
 const titles = ["Создать заявку на обмен", "Введите реквизиты"];
