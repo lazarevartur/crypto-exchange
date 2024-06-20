@@ -74,7 +74,7 @@ export default function PaymentPage() {
       <Flex gap="15px" fontSize="18px">
         <Text>Ожидание оплаты</Text>
         <Text fontWeight={600}>
-          №{payment?.id} от {fromDate}
+          ID: {payment?.id} от {fromDate}
         </Text>
       </Flex>
       <Flex gap="50px">

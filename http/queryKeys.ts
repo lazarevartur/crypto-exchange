@@ -1,4 +1,3 @@
-import {useTicketById} from "@/http/query/ticket";
 
 export const queryKeys = {
   useTokens: "useTokens",
@@ -6,5 +5,7 @@ export const queryKeys = {
   usePaymentById: "usePaymentById",
   useCreatePayment: "useCreatePayment",
   updatePaymentStatus: "updatePaymentStatus",
-  useTicketById: 'useTicketById'
+  useTicketById: "useTicketById",
+  useAllPayments: "useAllPayments",
+  useAllTickets: "useAllTickets",
 };

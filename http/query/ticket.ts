@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/http/queryKeys";
 import { cryptoChangeService } from "@/http/services";
+import { PaymentStatus } from "@prisma/client";
 
 export const useTicketById = (id: string | null) =>
   useQuery({
@@ -8,4 +9,11 @@ export const useTicketById = (id: string | null) =>
     queryFn: () => cryptoChangeService.getTicketById(id!),
     refetchInterval: 10000,
     enabled: !!id,
+  });
+
+export const useAllTickets = (status?: PaymentStatus) =>
+  useQuery({
+    queryKey: [queryKeys.useAllTickets, status],
+    queryFn: () => cryptoChangeService.getAllTickets(status),
+    refetchInterval: 10000,
   });
