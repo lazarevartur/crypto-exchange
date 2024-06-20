@@ -16,6 +16,8 @@ const TokenSchema = z.object({
   amount: z.number().positive(),
   price: z.number().positive(),
   network: z.string().nonempty(),
+  min: z.number().positive().default(0.1), // Обязательное поле с значением по умолчанию
+  infoText: z.string().optional(), // Необязательное поле
 });
 
 export async function POST(req: NextRequest) {
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, symbol, imageUrl, amount, price, network } = result.data;
+    const { name, symbol, imageUrl, amount, price, network, min, infoText } = result.data;
 
     // Проверка уникальности name и symbol
     const existingToken = await prisma.token.findFirst({
@@ -65,6 +67,8 @@ export async function POST(req: NextRequest) {
         amount,
         price,
         network,
+        min,
+        infoText,
       },
     });
 

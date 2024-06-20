@@ -25,6 +25,7 @@ const PaymentDataSchema = z.object({
     address: z.string().nonempty(),
     email: z.string().email(),
   }),
+  network: z.string().nonempty(),
   account: z.string().optional(), // добавлено поле account
 });
 
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
 
     if (!token) {
       // Создаем нового пользователя и генерируем токен
+
       const user = await prisma.user.create({
         data: {
           account: data.account, // установим поле account
@@ -55,6 +57,7 @@ export async function POST(req: NextRequest) {
           payments: {
             create: [
               {
+                // @ts-ignore
                 fromToken: {
                   connect: { id: data.from.tokenNameOrId },
                 },
@@ -67,8 +70,8 @@ export async function POST(req: NextRequest) {
                 recipientEmail: data.recipient.email,
                 expiresIn: expiresIn,
                 createdAt: createdAt,
-                status: PaymentStatus.PENDING, // установим статус по умолчанию
-                approveStatus: PaymentStatus.PENDING, // установим approveStatus по умолчанию
+                status: PaymentStatus.PENDING,
+                approveStatus: PaymentStatus.PENDING,
               },
             ],
           },
@@ -111,6 +114,7 @@ export async function POST(req: NextRequest) {
         }
 
         await prisma.payment.create({
+          // @ts-ignore
           data: {
             fromToken: {
               connect: { id: data.from.tokenNameOrId },
