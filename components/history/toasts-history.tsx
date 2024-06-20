@@ -31,7 +31,7 @@ export const ToastsHistory = () => {
     }
 
     return () => toast.closeAll();
-  }, [data]);
+  }, [tickets, toast]);
 
   useEffect(() => {
     if (data) {
@@ -54,7 +54,7 @@ export const ToastsHistory = () => {
     }
 
     return () => toast.closeAll();
-  }, [data]);
+  }, [data, toast]);
 
   return null;
 };

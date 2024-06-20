@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
           tokenFromPrice: payment.fromToken.price,
           tokenToPrice: payment.toToken.price,
           createdAt: new Date(),
+          userId: payment.userId
         },
       }),
     ]);

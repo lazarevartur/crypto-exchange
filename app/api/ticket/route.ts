@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   try {
-    const { error } = authenticateUser(req);
+    const { userId, error } = authenticateUser(req);
 
     if (error) {
       return error;
@@ -41,7 +41,10 @@ export async function GET(req: NextRequest) {
     }
 
     const tickets = await prisma.ticket.findMany({
-      where: status ? { status } : {},
+      where: {
+        userId: userId,
+        ...(status && { status: status }),
+      },
     });
 
     return NextResponse.json(tickets, { status: 200 });

@@ -24,6 +24,7 @@ model User {
   payments  Payment[]
   createdAt DateTime  @default(now()) @map("created_at")
   role      UserRole  @default(USER)
+  Ticket    Ticket[]
 }
 
 model Token {
@@ -67,6 +68,8 @@ model Ticket {
   id             String        @id @default(uuid())
   paymentId      String
   payment        Payment       @relation(fields: [paymentId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
   tokenFromPrice Float
   tokenToPrice   Float
   status         PaymentStatus @default(PENDING)

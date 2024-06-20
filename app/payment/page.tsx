@@ -57,7 +57,7 @@ export default function PaymentPage() {
   if (!payment) {
     return null;
   }
-
+  console.log(ticket)
   if (payment.status === "ACCEPTED" && ticket) {
     router.push(`/ticket?id=${ticket.id}`);
   }
