@@ -60,6 +60,18 @@ model Payment {
   status           PaymentStatus @default(PENDING)
   approveStatus    PaymentStatus @default(PENDING)
   network          String
+  Ticket           Ticket[]
+}
+
+model Ticket {
+  id             String        @id @default(uuid())
+  paymentId      String
+  payment        Payment       @relation(fields: [paymentId], references: [id])
+  tokenFromPrice Float
+  tokenToPrice   Float
+  status         PaymentStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  closedAt       DateTime?
 }
 
 model Tag {

@@ -36,13 +36,12 @@ const renderer = ({
   }
 };
 
-
 export default function PaymentPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const router = useRouter();
 
-  const { mutate, isPending } = useUpdatePaymentStatus();
+  const { mutate, data: ticket, isPending } = useUpdatePaymentStatus();
 
   const { payment } = usePaymentById(id);
   const fromDate = dayjs(payment?.createdAt).format("DD.MM.YYYY");
@@ -59,8 +58,8 @@ export default function PaymentPage() {
     return null;
   }
 
-  if (payment.status === "ACCEPTED") {
-    router.push(`/ticket?id=${id}`);
+  if (payment.status === "ACCEPTED" && ticket) {
+    router.push(`/ticket?id=${ticket.id}`);
   }
 
   return (
@@ -148,8 +147,12 @@ export default function PaymentPage() {
             </Text>
           </Flex>
           <Flex gap="10px">
-            <Button onClick={onAcceptHandler} isLoading={isPending}>Я оплатил</Button>
-            <Button onClick={onRejectHandler} isLoading={isPending}>Отмена</Button>
+            <Button onClick={onAcceptHandler} isLoading={isPending}>
+              Я оплатил
+            </Button>
+            <Button onClick={onRejectHandler} isLoading={isPending}>
+              Отмена
+            </Button>
           </Flex>
         </Flex>
       </Card>

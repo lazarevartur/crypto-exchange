@@ -1,7 +1,8 @@
 import axios from "axios";
-import { Payment, Tag, Token } from "@prisma/client";
+import { Payment, Tag, Token, Ticket } from "@prisma/client";
 import { IPaymentRequest, IUpdateStatusRequest } from "@/lib/types/types";
 import { IPayloadResponse } from "@/lib/types/Payload";
+import {ITicketResponse} from "@/lib/types/http/Ticket";
 
 const httpClient = axios.create({
   baseURL: "/api",
@@ -18,7 +19,7 @@ export const cryptoChangeService = {
     return data;
   },
   updatePaymentStatus: async (body: IUpdateStatusRequest) => {
-    const { data } = await httpClient.post<Payment>("/payments/status", body);
+    const { data } = await httpClient.post<Ticket>("/payments/status", body);
 
     return data;
   },
@@ -39,4 +40,12 @@ export const cryptoChangeService = {
 
     return data;
   },
+
+  getTicketById: async (id: string) => {
+    const { data } = await httpClient.get<ITicketResponse>("/ticket", {
+      params: { id },
+    });
+
+    return data;
+  }
 };
