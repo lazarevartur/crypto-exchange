@@ -11,6 +11,7 @@ export interface IPaymentRequest {
   to: Token
   recipient: Recipient
   account?: string
+  network: string
 }
 
 interface Token {

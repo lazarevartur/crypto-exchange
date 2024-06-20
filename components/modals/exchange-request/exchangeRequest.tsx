@@ -30,7 +30,9 @@ const ExchangeRequest = () => {
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
-  const { mutate } = useCreatePayment();
+  const { mutate,  } = useCreatePayment();
+
+  console.log(data)
 
   const titles = ["Создать заявку на обмен", "Введите реквизиты"];
 
@@ -41,6 +43,7 @@ const ExchangeRequest = () => {
 
     if (isLastStep) {
       const data: IPaymentRequest = {
+        network: network ?? "Omni",
         from: {
           amount: amount.from.toString(),
           tokenNameOrId: from!.id,

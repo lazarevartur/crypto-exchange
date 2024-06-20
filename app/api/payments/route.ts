@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { message: "Invalid input data", errors: result.error.errors },
-        { status: 400 },
+          { message: "Invalid input data", errors: result.error.errors },
+          { status: 400 },
       );
     }
 
@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
                 toAmount: data.to.amount,
                 recipientAddress: data.recipient.address,
                 recipientEmail: data.recipient.email,
+                network: data.network, // Добавлено поле network
                 expiresIn: expiresIn,
                 createdAt: createdAt,
                 status: PaymentStatus.PENDING,
@@ -87,13 +88,13 @@ export async function POST(req: NextRequest) {
         user,
       });
       response.headers.append(
-        "Set-Cookie",
-        serialize("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 60 * 60 * 24, // 1 day
-          path: "/",
-        }),
+          "Set-Cookie",
+          serialize("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24, // 1 day
+            path: "/",
+          }),
       );
 
       return response;
@@ -108,8 +109,8 @@ export async function POST(req: NextRequest) {
 
         if (!user) {
           return NextResponse.json(
-            { message: "User not found" },
-            { status: 404 },
+              { message: "User not found" },
+              { status: 404 },
           );
         }
 
@@ -126,6 +127,7 @@ export async function POST(req: NextRequest) {
             toAmount: data.to.amount,
             recipientAddress: data.recipient.address,
             recipientEmail: data.recipient.email,
+            network: data.network, // Добавлено поле network
             expiresIn: expiresIn,
             createdAt: createdAt,
             status: PaymentStatus.PENDING, // установим статус по умолчанию
@@ -137,8 +139,8 @@ export async function POST(req: NextRequest) {
         });
 
         return NextResponse.json(
-          { message: "Payment added successfully" },
-          { status: 200 },
+            { message: "Payment added successfully" },
+            { status: 200 },
         );
       } else {
         return NextResponse.json({ message: "Invalid token" }, { status: 403 });
@@ -147,8 +149,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error in POST /api/payments:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
+        { message: "Internal server error" },
+        { status: 500 },
     );
   }
 }
@@ -162,37 +164,57 @@ export async function GET(req: NextRequest) {
     }
 
     const url = new URL(req.url);
+    const paymentId = url.searchParams.get("id");
     const statusParam = url.searchParams.get("status")?.toUpperCase();
 
+    if (paymentId) {
+      // Получение платежа по ID
+      const payment = await prisma.payment.findUnique({
+        where: { id: paymentId },
+      });
+
+      if (!payment) {
+        return NextResponse.json(
+            { message: "Payment not found" },
+            { status: 404 },
+        );
+      }
+
+      return NextResponse.json(
+          { message: "Payment retrieved successfully", payment },
+          { status: 200 },
+      );
+    }
+
     if (
-      !statusParam ||
-      !Object.values(PaymentStatus).includes(statusParam as PaymentStatus)
+        statusParam &&
+        !Object.values(PaymentStatus).includes(statusParam as PaymentStatus)
     ) {
       return NextResponse.json(
-        { message: "Invalid status parameter" },
-        { status: 400 },
+          { message: "Invalid status parameter" },
+          { status: 400 },
       );
     }
 
     const status = statusParam as PaymentStatus;
-
+    console.log({userId})
     // Получение всех платежей по userId и статусу
     const payments = await prisma.payment.findMany({
       where: {
         userId: userId,
-        status: status,
+        ...(status && { status: status }),
       },
     });
 
     return NextResponse.json(
-      { message: "Payments retrieved successfully", payments },
-      { status: 200 },
+        { message: "Payments retrieved successfully", payments },
+        { status: 200 },
     );
   } catch (error) {
     console.error("Error in GET /api/payments:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
+        { message: "Internal server error" },
+        { status: 500 },
     );
   }
 }
