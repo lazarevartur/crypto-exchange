@@ -9,10 +9,7 @@ export const useGetTags = () => {
     queryFn: cryptoChangeService.getAllTokenTags,
   });
 
-  const prepareTags = useCallback(
-    () => (data ? data.map(({ name }) => name) : [data]),
-    [data],
-  );
+  const prepareTags = useCallback(() => (data ? data : []), [data]);
 
   return {
     prepareTags,

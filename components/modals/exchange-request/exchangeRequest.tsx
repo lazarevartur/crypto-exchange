@@ -11,16 +11,20 @@ import {
   useDisclosure,
   useSteps,
 } from "@chakra-ui/react";
-import { useCreatePayment } from "@/http/mutation/useCreatePayment";
+
 import { FirstStep } from "@/components/exchage/ExchangeRequest/FirstStep";
 import { SecondStep } from "@/components/exchage/ExchangeRequest/SecondStep";
 import { useEffect } from "react";
 import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
 import { IPaymentRequest } from "@/lib/types/types";
+import { useRouter } from "next/navigation";
+import { useCreatePayment } from "@/http/mutation/paymentMutation";
 
 const steps = [FirstStep, SecondStep];
+const titles = ["Создать заявку на обмен", "Введите реквизиты"];
 
 const ExchangeRequest = () => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { activeStep, goToNext, setActiveStep } = useSteps({
     index: 0,
@@ -30,9 +34,7 @@ const ExchangeRequest = () => {
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
-  const { mutate } = useCreatePayment();
-
-  const titles = ["Создать заявку на обмен", "Введите реквизиты"];
+  const { mutate, data, isPending } = useCreatePayment();
 
   const onClickHandler = () => {
     if (!isLastStep) {
@@ -41,6 +43,7 @@ const ExchangeRequest = () => {
 
     if (isLastStep) {
       const data: IPaymentRequest = {
+        network: network ?? "Omni",
         from: {
           amount: amount.from.toString(),
           tokenNameOrId: from!.id,
@@ -58,6 +61,12 @@ const ExchangeRequest = () => {
       mutate(data);
     }
   };
+
+  useEffect(() => {
+    if (data?.id) {
+      router.push(`/payment?id=${data?.id}`);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -79,7 +88,12 @@ const ExchangeRequest = () => {
             <ActiveStepComponent />
           </ModalBody>
           <ModalFooter>
-            <Button bg="#fcbf11" w="100%" onClick={onClickHandler}>
+            <Button
+              bg="#fcbf11"
+              w="100%"
+              onClick={onClickHandler}
+              isLoading={isPending}
+            >
               Продолжить
             </Button>
           </ModalFooter>

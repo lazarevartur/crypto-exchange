@@ -1,7 +1,67 @@
+"use client";
 import { Button, Card, Container, Flex, Spinner, Text } from "@chakra-ui/react";
-import React from "react";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { usePaymentById } from "@/http/query/payment";
+import dayjs from "dayjs";
+import { useUpdatePaymentStatus } from "@/http/mutation/paymentMutation";
+import Countdown from "react-countdown";
+
+const renderer = ({
+  minutes,
+  seconds,
+  completed,
+}: {
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+}) => {
+  if (completed) {
+    return <Text>Время вышло</Text>;
+  } else {
+    return (
+      <Flex alignItems="center" gap="15px" justifyContent="space-evenly">
+        <Text>
+          {minutes}:{seconds}
+        </Text>
+        <Spinner
+          thickness="6px"
+          speed="1s"
+          emptyColor="gray.200"
+          color="rgb(6, 1, 255)"
+          size="xl"
+        />
+      </Flex>
+    );
+  }
+};
 
 export default function PaymentPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const router = useRouter();
+
+  const { mutate, data: ticket, isPending } = useUpdatePaymentStatus();
+
+  const { payment } = usePaymentById(id);
+  const fromDate = dayjs(payment?.createdAt).format("DD.MM.YYYY");
+
+  const onAcceptHandler = () => {
+    id && mutate({ paymentId: id, status: "ACCEPTED" });
+  };
+
+  const onRejectHandler = () => {
+    id && mutate({ paymentId: id, status: "REJECTED" });
+  };
+
+  if (!payment) {
+    return null;
+  }
+  console.log(ticket)
+  if (payment.status === "ACCEPTED" && ticket) {
+    router.push(`/ticket?id=${ticket.id}`);
+  }
+
   return (
     <Container
       as="section"
@@ -13,7 +73,9 @@ export default function PaymentPage() {
     >
       <Flex gap="15px" fontSize="18px">
         <Text>Ожидание оплаты</Text>
-        <Text fontWeight={600}> №191813 от 15.06.2024</Text>
+        <Text fontWeight={600}>
+          ID: {payment?.id} от {fromDate}
+        </Text>
       </Flex>
       <Flex gap="50px">
         <Card padding="16px" maxW="450px">
@@ -26,13 +88,13 @@ export default function PaymentPage() {
             color="#212121"
           >
             <Text>
-              Вы меняете 37,21872 Binance Coin BNB на 0,33902474 Bitcoin BTC
+              Вы меняете {payment?.fromAmount} {payment?.fromToken?.name}{" "}
+              {payment?.fromToken?.symbol} на {payment?.toAmount}{" "}
+              {payment?.toToken?.name} {payment?.toToken?.symbol}
             </Text>
             <Text>
               Получаете на:{" "}
-              <Text color="#fcbf11">
-                0xf45F49a56d981b05CA4d915f874693AC02044e0f
-              </Text>
+              <Text color="#fcbf11">{payment?.recipientAddress}</Text>
             </Text>
             <Text>Политика AML / KYC</Text>
             <Text fontSize="14px">
@@ -45,16 +107,10 @@ export default function PaymentPage() {
         </Card>
 
         <Flex flexDir="column" gap="15px" justifyContent="center">
-          <Flex alignItems="center" gap="15px">
-            <Text>15:00</Text>
-            <Spinner
-              thickness="6px"
-              speed="1s"
-              emptyColor="gray.200"
-              color="rgb(6, 1, 255)"
-              size="xl"
-            />
-          </Flex>
+          <Countdown
+            renderer={renderer}
+            date={new Date(payment?.expiresIn).getTime()}
+          />
           <Text fontSize="14px" w="150px">
             Оплатите заявку до окончания этого времени
           </Text>
@@ -80,9 +136,9 @@ export default function PaymentPage() {
           <Text>
             Для совершения обмена Вам необходимо перевести{" "}
             <Text as="span" fontWeight={600}>
-              37,21872 BNB
+              {payment?.fromAmount} {payment?.fromToken?.symbol}
             </Text>{" "}
-            на реквизиты
+            на реквизиты.
           </Text>
           <Flex flexDir="column" fontSize="16px">
             <Text fontWeight={600}>Адрес получения:</Text>
@@ -91,8 +147,12 @@ export default function PaymentPage() {
             </Text>
           </Flex>
           <Flex gap="10px">
-            <Button>Я оплатил</Button>
-            <Button>Отмена</Button>
+            <Button onClick={onAcceptHandler} isLoading={isPending}>
+              Я оплатил
+            </Button>
+            <Button onClick={onRejectHandler} isLoading={isPending}>
+              Отмена
+            </Button>
           </Flex>
         </Flex>
       </Card>

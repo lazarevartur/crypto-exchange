@@ -24,6 +24,7 @@ model User {
   payments  Payment[]
   createdAt DateTime  @default(now()) @map("created_at")
   role      UserRole  @default(USER)
+  Ticket    Ticket[]
 }
 
 model Token {
@@ -38,6 +39,8 @@ model Token {
   PaymentTokenFrom Payment[] @relation("TokenFrom")
   PaymentTokenTo   Payment[] @relation("TokenTo")
   tags             String[]
+  min              Float     @default(0.1)
+  infoText         String?
 }
 
 model Payment {
@@ -57,6 +60,21 @@ model Payment {
   closedIn         DateTime?     @map("closed_in")
   status           PaymentStatus @default(PENDING)
   approveStatus    PaymentStatus @default(PENDING)
+  network          String
+  Ticket           Ticket[]
+}
+
+model Ticket {
+  id             String        @id @default(uuid())
+  paymentId      String
+  payment        Payment       @relation(fields: [paymentId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  tokenFromPrice Float
+  tokenToPrice   Float
+  status         PaymentStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  closedAt       DateTime?
 }
 
 model Tag {

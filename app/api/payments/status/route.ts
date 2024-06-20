@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     // Получение платежа и проверка владельца и срока действия
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
-      include: { user: true },
+      include: { user: true, fromToken: true, toToken: true },
     });
 
     if (!payment) {
@@ -48,24 +48,29 @@ export async function POST(req: NextRequest) {
 
     if (payment.userId !== userId) {
       return NextResponse.json(
-        { message: "Forbidden: You do not own this payments" },
+        { message: "Forbidden: You do not own this payment" },
         { status: 403 },
       );
     }
 
-    // Обновление статуса платежа
-    const updatedPayment = await prisma.payment.update({
-      where: { id: paymentId },
-      data: { status: status },
-    });
+    // Обновление статуса платежа и создание тикета
+    const [_, ticket] = await prisma.$transaction([
+      prisma.payment.update({
+        where: { id: paymentId },
+        data: { status: status },
+      }),
+      prisma.ticket.create({
+        data: {
+          paymentId: paymentId,
+          tokenFromPrice: payment.fromToken.price,
+          tokenToPrice: payment.toToken.price,
+          createdAt: new Date(),
+          userId: payment.userId
+        },
+      }),
+    ]);
 
-    return NextResponse.json(
-      {
-        message: "Payment status updated successfully",
-        payment: updatedPayment,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json(ticket, { status: 200 });
   } catch (error) {
     console.error("Error in POST /api/payments/status:", error);
     return NextResponse.json(
