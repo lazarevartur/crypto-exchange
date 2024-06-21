@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Payment, Tag, Token, Ticket, PaymentStatus } from "@prisma/client";
+import { Payment, PaymentStatus, Ticket, Token } from "@prisma/client";
 import { IPaymentRequest, IUpdateStatusRequest } from "@/lib/types/types";
 import { IPayloadResponse } from "@/lib/types/Payload";
 import { ITicketResponse } from "@/lib/types/http/Ticket";
@@ -29,7 +29,7 @@ export const cryptoChangeService = {
     return data;
   },
   getAllTokenTags: async () => {
-    const { data } = await httpClient.get<Tag[]>("/tags");
+    const { data } = await httpClient.get<string[]>("/tags");
 
     return data;
   },
