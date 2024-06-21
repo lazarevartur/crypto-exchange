@@ -11,7 +11,7 @@ const Footer = () => {
         display="flex"
         h="268px"
         maxW="container.xl"
-        gap='50px'
+        gap="50px"
         color="white"
         alignItems="center"
       >

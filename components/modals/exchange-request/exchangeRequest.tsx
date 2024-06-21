@@ -19,6 +19,7 @@ import { useActiveChangeCurrency } from "@/state/activeChangeCurrency";
 import { IPaymentRequest } from "@/lib/types/types";
 import { useRouter } from "next/navigation";
 import { useCreatePayment } from "@/http/mutation/paymentMutation";
+import { useConfig } from "@/state/config";
 
 const steps = [FirstStep, SecondStep];
 const titles = ["Создать заявку на обмен", "Введите реквизиты"];
@@ -35,6 +36,7 @@ const ExchangeRequest = () => {
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
   const { mutate, data, isPending } = useCreatePayment();
+  const { setIsAuth } = useConfig();
 
   const onClickHandler = () => {
     if (!isLastStep) {
@@ -65,6 +67,7 @@ const ExchangeRequest = () => {
   useEffect(() => {
     if (data?.id) {
       router.push(`/payment?id=${data?.id}`);
+      setIsAuth(true);
     }
   }, [data]);
 
