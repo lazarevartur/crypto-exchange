@@ -3,7 +3,6 @@ import React, { ReactNode } from "react";
 import { Layout } from "@/components/layout/Layout";
 
 import type { Metadata } from "next";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +18,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <ReactQueryDevtools />
           <Layout>{children}</Layout>
         </Providers>
       </body>
