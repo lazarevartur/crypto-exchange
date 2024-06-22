@@ -4,12 +4,8 @@ import {
   Flex,
   Heading,
   Image,
-  Tab as ChakraTab,
   TabList,
-  TabPanel as ChakraTabPanel,
-  TabPanelProps,
   TabPanels,
-  TabProps,
   Tabs,
 } from "@chakra-ui/react";
 import { useMemo } from "react";
@@ -17,25 +13,7 @@ import { useMemo } from "react";
 import type { IReserveItem } from "@/lib/types/types";
 import { useTokens } from "@/http/query/tokens";
 import { useGetTags } from "@/http/query/tags";
-
-const Tab = (props: TabProps) => (
-  <ChakraTab
-    fontSize="14px"
-    color="black"
-    border="2px solid"
-    borderColor="#d8dadc"
-    borderRadius="10px"
-    boxShadow="0 1px 4px rgba(0, 0, 0, .2)"
-    _hover={{ boxShadow: "0 1px 4px rgba(0, 0, 0, .5)" }}
-    _selected={{ boxShadow: "none", borderColor: "#fad753" }}
-    textTransform="uppercase"
-    {...props}
-  />
-);
-
-const TabPanel = (props: TabPanelProps) => (
-  <ChakraTabPanel px="0px" {...props} />
-);
+import { Tab, TabPanel } from "@/components/tabs";
 
 const ReserveItem = ({
   name,

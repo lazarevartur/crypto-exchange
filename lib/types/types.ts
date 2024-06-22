@@ -30,3 +30,12 @@ export interface Recipient {
   address: string;
   email: string;
 }
+
+export interface AdminHistoryItem {
+  paymentId: string;
+  tokenFromPrice: number;
+  tokenToPrice: number;
+  createdAt: Date;
+  closedAt: Date | null;
+  status: PaymentStatus;
+}

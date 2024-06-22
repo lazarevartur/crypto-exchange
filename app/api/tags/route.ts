@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
-import cache from "@/app/api/_services/cache";
+import cache from "@/app/api/_lib/cache";
 import { authenticateUser, authorizeAdmin } from "@/app/api/_utils/utils";
 
 const prisma = new PrismaClient();
