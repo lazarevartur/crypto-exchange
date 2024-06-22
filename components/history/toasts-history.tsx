@@ -4,11 +4,19 @@ import { useAllPayments } from "@/http/query/payment";
 import { useEffect } from "react";
 import { Link } from "@chakra-ui/next-js";
 import { useAllTickets } from "@/http/query/ticket";
+import { useConfig } from "@/state/config";
 
 export const ToastsHistory = () => {
   const { data } = useAllPayments("PENDING");
   const { data: tickets } = useAllTickets("PENDING");
+  const { isAuth } = useConfig();
   const toast = useToast();
+
+  useEffect(() => {
+    if (!isAuth) {
+      toast.closeAll()
+    }
+  }, [isAuth]);
 
   useEffect(() => {
     if (tickets) {

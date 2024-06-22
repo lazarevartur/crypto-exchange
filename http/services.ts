@@ -61,4 +61,17 @@ export const cryptoChangeService = {
 
     return data;
   },
+
+  login: async (address: string) => {
+    const { data } = await httpClient.post<{ userId: string }>("/auth/login", {
+      ethAddress: address,
+    });
+
+    return data;
+  },
+  logout: async () => {
+    const { data } = await httpClient.post("/auth/logout");
+
+    return data;
+  },
 };

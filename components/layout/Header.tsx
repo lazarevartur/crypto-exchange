@@ -3,11 +3,30 @@
 import { Container, Flex, Image } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/next-js";
 import { LINKS_HEADER } from "@/constants";
-import { ConnectKitButton } from "connectkit";
-import { useAccount } from "wagmi";
+import { ConnectKitButton, useModal } from "connectkit";
+import { useLogin } from "@/http/mutation/auth";
+import { cryptoChangeService } from "@/http/services";
+import { useConfig } from "@/state/config";
 
 const Header = () => {
-  const { address } = useAccount();
+  const { mutate } = useLogin();
+  const { setIsAuth } = useConfig();
+
+  useModal({
+    onConnect: ({ address }) => {
+      if (address) {
+        mutate(address);
+        setIsAuth(true);
+      }
+    },
+    onDisconnect: () => {
+      (async () => {
+        await cryptoChangeService.logout();
+        setIsAuth(false);
+        window.location.reload();
+      })();
+    },
+  });
 
   return (
     <Container
