@@ -8,4 +8,5 @@ export const queryKeys = {
   useTicketById: "useTicketById",
   useAllPayments: "useAllPayments",
   useAllTickets: "useAllTickets",
+  useLogin: "useLogin",
 };

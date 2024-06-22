@@ -3,8 +3,7 @@ import { PaymentStatus, PrismaClient } from "@prisma/client";
 import type { NextRequest } from "next/server";
 import { authenticateUser } from "@/app/api/_utils/utils";
 
-export const dynamic = 'force-dynamic'
-
+export const dynamic = "force-dynamic";
 
 const prisma = new PrismaClient();
 
