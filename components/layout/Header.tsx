@@ -1,10 +1,14 @@
 "use client";
 
-import { Button, Container, Flex, Icon, Image } from "@chakra-ui/react";
+import { Container, Flex, Image } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/next-js";
-import {LINKS_HEADER} from "@/constants";
+import { LINKS_HEADER } from "@/constants";
+import { ConnectKitButton } from "connectkit";
+import { useAccount } from "wagmi";
 
 const Header = () => {
+  const { address } = useAccount();
+
   return (
     <Container
       as="header"
@@ -37,7 +41,8 @@ const Header = () => {
           ))}
         </Flex>
       </Flex>
-      <Button variant="outline">Wallet Connect</Button>
+
+      <ConnectKitButton theme="soft" />
     </Container>
   );
 };
