@@ -5,7 +5,9 @@ export interface IReserveItem {
   name: string;
   icon: string;
   amount: number;
+  price: number;
   type: string[];
+  min: number
 }
 
 export interface IPaymentRequest {

@@ -26,14 +26,14 @@ export const SecondStep = () => {
   return (
     <Flex flexDir="column" gap="35px">
       <Flex sx={SecondStepInputGroutStyles}>
-        <Text>Реквизиты получателя:</Text>
+        <Text>Адрес получателя:</Text>
         <Input {...register("address")} />
       </Flex>
       <Flex sx={SecondStepInputGroutStyles}>
         <Text>E-mail:</Text>
         <Input {...register("email")} />
       </Flex>
-      <Flex flexDir="column">Есть промокод?</Flex>
+      {/*<Flex flexDir="column">Есть промокод?</Flex>*/}
       <Checkbox {...register("checkbox")} defaultChecked isRequired>
         <Text fontSize="14px">
           Вы соглашаетесь с правилами сервиса и регламентом проведения

@@ -82,3 +82,26 @@ export const generateAndSetCookieToken = (
     }),
   );
 };
+
+export function calculateExchangeAmount({
+  amount,
+  sourceToUsdRate,
+  targetToUsdRate,
+  commissionRate,
+}: {
+  amount: number;
+  sourceToUsdRate: number;
+  targetToUsdRate: number;
+  commissionRate?: number;
+}) {
+  const totalUsd = amount * sourceToUsdRate;
+
+  let commission = 0;
+  if (commissionRate) {
+    commission = totalUsd * commissionRate;
+  }
+
+  const totalUsdAfterCommission = totalUsd - commission;
+
+  return totalUsdAfterCommission / targetToUsdRate;
+}

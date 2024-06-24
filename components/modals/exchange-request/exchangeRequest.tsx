@@ -10,6 +10,7 @@ import {
   ModalOverlay,
   useDisclosure,
   useSteps,
+  useToast,
 } from "@chakra-ui/react";
 
 import { FirstStep } from "@/components/exchage/ExchangeRequest/FirstStep";
@@ -20,12 +21,14 @@ import { IPaymentRequest } from "@/lib/types/types";
 import { useRouter } from "next/navigation";
 import { useCreatePayment } from "@/http/mutation/paymentMutation";
 import { useConfig } from "@/state/config";
+import { AxiosError } from "axios";
 
 const steps = [FirstStep, SecondStep];
 const titles = ["Создать заявку на обмен", "Введите реквизиты"];
 
 const ExchangeRequest = () => {
   const router = useRouter();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { activeStep, goToNext, setActiveStep } = useSteps({
     index: 0,
@@ -35,7 +38,7 @@ const ExchangeRequest = () => {
 
   const ActiveStepComponent = steps[activeStep];
   const isLastStep = steps.length - 1 === activeStep;
-  const { mutate, data, isPending } = useCreatePayment();
+  const { mutate, data, isPending, error } = useCreatePayment();
   const { setIsAuth } = useConfig();
 
   const onClickHandler = () => {
@@ -63,6 +66,19 @@ const ExchangeRequest = () => {
       mutate(data);
     }
   };
+  useEffect(() => {
+    if (error instanceof AxiosError) {
+      toast({
+        position: "top",
+        title: `Invalid input data`,
+        description: (error.response?.data.errors as { message: string }[]).map(
+          (e) => <p key={e.message}>{e.message}</p>,
+        ),
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [error]);
 
   useEffect(() => {
     if (data?.id) {
@@ -96,6 +112,7 @@ const ExchangeRequest = () => {
               w="100%"
               onClick={onClickHandler}
               isLoading={isPending}
+              isDisabled={amount.from <= 0 || amount.to <= 0}
             >
               Продолжить
             </Button>

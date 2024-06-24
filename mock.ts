@@ -1,5 +1,4 @@
 import { CATEGORIES } from "@/constants";
-import { IReserveItem } from "@/lib/types/types";
 
 function getRandomName() {
   const values = [
@@ -32,13 +31,3 @@ function getRandomCategories() {
   const shuffledCategories = CATEGORIES.sort(() => 0.5 - Math.random());
   return shuffledCategories.slice(0, numberOfCategories);
 }
-
-export const MockData = Array.from({ length: 34 }).map<IReserveItem>(
-  (_, i) => ({
-    id: i.toString(),
-    name: getRandomName(),
-    amount: getRandomNumber(),
-    icon: "/btc.svg",
-    type: getRandomCategories(),
-  }),
-);

@@ -6,12 +6,16 @@ import { serialize } from "cookie";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 import dayjs from "dayjs";
-import { authenticateUser } from "@/app/api/_utils/utils";
+import {
+  authenticateUser,
+  validateEthereumAddress,
+} from "@/app/api/_utils/utils";
 
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || "your-secret-key";
 
 // Определение схемы данных с использованием Zod
+
 const PaymentDataSchema = z.object({
   from: z.object({
     tokenNameOrId: z.string().nonempty(),
@@ -22,11 +26,14 @@ const PaymentDataSchema = z.object({
     amount: z.string().nonempty(),
   }),
   recipient: z.object({
-    address: z.string().nonempty(),
+    // @ts-ignore
+    address: z.string().refine((address) => validateEthereumAddress(address), {
+      message: "Invalid Ethereum address",
+      validation: "ethereum_address",
+    }),
     email: z.string().email(),
   }),
   network: z.string().nonempty(),
-  account: z.string().optional(), // добавлено поле account
 });
 
 export async function POST(req: NextRequest) {
@@ -35,8 +42,11 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-          { message: "Invalid input data", errors: result.error.errors },
-          { status: 400 },
+        {
+          message: "Invalid input data",
+          errors: result.error.errors,
+        },
+        { status: 400 },
       );
     }
 
@@ -51,7 +61,6 @@ export async function POST(req: NextRequest) {
 
       const user = await prisma.user.create({
         data: {
-          account: data.account, // установим поле account
           createdAt: createdAt,
           role: UserRole.USER, // установим роль по умолчанию
           payments: {
@@ -88,13 +97,13 @@ export async function POST(req: NextRequest) {
 
       const response = NextResponse.json(user.payments[0]);
       response.headers.append(
-          "Set-Cookie",
-          serialize("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24, // 1 day
-            path: "/",
-          }),
+        "Set-Cookie",
+        serialize("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 60 * 60 * 24, // 1 day
+          path: "/",
+        }),
       );
 
       return response;
@@ -109,8 +118,8 @@ export async function POST(req: NextRequest) {
 
         if (!user) {
           return NextResponse.json(
-              { message: "User not found" },
-              { status: 404 },
+            { message: "User not found" },
+            { status: 404 },
           );
         }
 
@@ -135,7 +144,7 @@ export async function POST(req: NextRequest) {
             user: {
               connect: { id: userId },
             },
-          }
+          },
         });
 
         return NextResponse.json(payment, { status: 200 });
@@ -146,8 +155,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error in POST /api/payments:", error);
     return NextResponse.json(
-        { message: "Internal server error" },
-        { status: 500 },
+      { message: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -176,8 +185,8 @@ export async function GET(req: NextRequest) {
 
       if (!payment) {
         return NextResponse.json(
-            { message: "Payment not found" },
-            { status: 404 },
+          { message: "Payment not found" },
+          { status: 404 },
         );
       }
 
@@ -185,12 +194,12 @@ export async function GET(req: NextRequest) {
     }
 
     if (
-        statusParam &&
-        !Object.values(PaymentStatus).includes(statusParam as PaymentStatus)
+      statusParam &&
+      !Object.values(PaymentStatus).includes(statusParam as PaymentStatus)
     ) {
       return NextResponse.json(
-          { message: "Invalid status parameter" },
-          { status: 400 },
+        { message: "Invalid status parameter" },
+        { status: 400 },
       );
     }
 
@@ -212,8 +221,8 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error in GET /api/payments:", error);
     return NextResponse.json(
-        { message: "Internal server error" },
-        { status: 500 },
+      { message: "Internal server error" },
+      { status: 500 },
     );
   }
 }
