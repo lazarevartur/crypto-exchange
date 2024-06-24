@@ -1,9 +1,9 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { PaymentStatus } from "@prisma/client";
-import { authenticateUser } from "@/app/api/_utils/utils";
-import { getTicketById } from "@/app/api/_services/tickets.services";
+import type { NextRequest } from "next/server";
+import { authenticateUser, authorizeAdmin } from "@/app/api/_utils/utils";
 import prisma from "@/app/api/_lib/db";
+import { getTicketById } from "@/app/api/_services/tickets.services";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +13,12 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       return error;
+    }
+
+    const { error: roleError } = await authorizeAdmin(userId);
+
+    if (roleError) {
+      return roleError;
     }
 
     const url = new URL(req.url);
@@ -34,9 +40,17 @@ export async function GET(req: NextRequest) {
 
     const tickets = await prisma.ticket.findMany({
       where: {
-        userId: userId,
         ...(status && { status: status }),
       },
+      include: {
+        payment: {
+          include: {
+            fromToken: true,
+            toToken: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
     });
 
     return NextResponse.json(tickets, { status: 200 });

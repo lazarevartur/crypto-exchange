@@ -54,6 +54,13 @@ export const cryptoChangeService = {
 
     return data;
   },
+  getAllTicketsAdmin: async (status?: PaymentStatus) => {
+    const { data } = await httpClient.get<ITicketResponse[]>("/tickets/admin", {
+      params: { status },
+    });
+
+    return data;
+  },
   getTicketById: async (id: string) => {
     const { data } = await httpClient.get<ITicketResponse>("/tickets", {
       params: { id },
@@ -71,6 +78,19 @@ export const cryptoChangeService = {
   },
   logout: async () => {
     const { data } = await httpClient.post("/auth/logout");
+
+    return data;
+  },
+  check: async () => {
+    const { data } = await httpClient.get<boolean>("/auth/check");
+
+    return data;
+  },
+  changeTicketStatusAdmin: async (body: {
+    ticketId: string;
+    status: PaymentStatus;
+  }) => {
+    const { data } = await httpClient.post("/tickets/status", body);
 
     return data;
   },
