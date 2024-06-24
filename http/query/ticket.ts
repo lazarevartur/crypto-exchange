@@ -37,7 +37,7 @@ export const useAdminAllTickets = (status?: PaymentStatus) => {
     () =>
       data
         ? data.map<AdminHistoryItem>((ticket) => ({
-            paymentId: ticket.paymentId,
+            ticketId: ticket.id,
             status: ticket.status,
             tokenFromPrice: ticket.tokenFromPrice,
             tokenToPrice: ticket.tokenToPrice,

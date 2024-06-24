@@ -81,4 +81,17 @@ export const cryptoChangeService = {
 
     return data;
   },
+  check: async () => {
+    const { data } = await httpClient.get<boolean>("/auth/check");
+
+    return data;
+  },
+  changeTicketStatusAdmin: async (body: {
+    ticketId: string;
+    status: PaymentStatus;
+  }) => {
+    const { data } = await httpClient.post("/tickets/status", body);
+
+    return data;
+  },
 };

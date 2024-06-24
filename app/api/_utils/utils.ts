@@ -1,10 +1,9 @@
 // utils/auth.ts
 import { NextRequest, NextResponse } from "next/server";
 import { verify, JwtPayload, sign } from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import { serialize } from "cookie";
+import prisma from "@/app/api/_lib/db";
 
-const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || "your-secret-key";
 
 export const authenticateUser = (req: NextRequest) => {

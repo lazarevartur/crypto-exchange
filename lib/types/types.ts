@@ -32,7 +32,7 @@ export interface Recipient {
 }
 
 export interface AdminHistoryItem {
-  paymentId: string;
+  ticketId: string;
   tokenFromPrice: number;
   tokenToPrice: number;
   createdAt: Date;
