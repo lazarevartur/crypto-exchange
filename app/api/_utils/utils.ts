@@ -1,8 +1,9 @@
 // utils/auth.ts
 import { NextRequest, NextResponse } from "next/server";
-import { verify, JwtPayload, sign } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { serialize } from "cookie";
 import prisma from "@/app/api/_lib/db";
+import dayjs from "dayjs";
 
 const secret = process.env.JWT_SECRET || "your-secret-key";
 
@@ -105,3 +106,48 @@ export function calculateExchangeAmount({
 
   return totalUsdAfterCommission / targetToUsdRate;
 }
+
+export function shortenUUID(uuid: string): string {
+  if (uuid.length <= 8) {
+    return uuid;
+  }
+  return uuid.slice(0, 8) + "...";
+}
+
+export const numberFormatUS = (
+  amount?: string | number,
+  fractionDigits?: number,
+) => {
+  if (amount === undefined || amount === null || isNaN(Number(amount))) {
+    return "0";
+  }
+
+  const locale = "en-US";
+  const amountStr = String(amount);
+
+  const [mainString, decimalString = ""] = amountStr.split(".");
+
+  const mainFormat = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  const decimalFormat = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: fractionDigits !== undefined ? fractionDigits : 0,
+    maximumFractionDigits: fractionDigits !== undefined ? fractionDigits : 2,
+  });
+
+  const mainBigInt = BigInt(mainString);
+  const mainFinal = mainFormat.format(mainBigInt);
+
+  let decimalFinal = "";
+  if (decimalString) {
+    const decimalFullNumber = Number(`0.${decimalString}`);
+    decimalFinal = decimalFormat.format(decimalFullNumber).slice(1);
+  }
+
+  return `${mainFinal}${decimalFinal}`;
+};
+
+export const dateFormatWithTime = (date: Date) =>
+  dayjs(date).format("HH:mm DD.MM.YYYY");

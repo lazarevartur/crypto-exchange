@@ -4,7 +4,7 @@ import { cryptoChangeService } from "@/http/services";
 import { PaymentStatus } from "@prisma/client";
 import { useConfig } from "@/state/config";
 import { useCallback } from "react";
-import { AdminHistoryItem } from "@/lib/types/types";
+import { AdminHistoryItem, IUserHistoryItem } from "@/lib/types/types";
 
 export const useTicketById = (id: string | null) =>
   useQuery({
@@ -16,12 +16,38 @@ export const useTicketById = (id: string | null) =>
 
 export const useAllTickets = (status?: PaymentStatus) => {
   const { isAuth } = useConfig();
-  return useQuery({
+
+  const { data, ...rest } = useQuery({
     queryKey: [queryKeys.useAllTickets, status],
     queryFn: () => cryptoChangeService.getAllTickets(status),
     refetchInterval: 10000,
     enabled: !!isAuth,
   });
+
+  const prepareTicketsData = useCallback(
+    () =>
+      data
+        ? data.map<IUserHistoryItem>((ticket) => ({
+            ticketId: ticket.id,
+            status: ticket.status,
+            from: {
+              amount: ticket?.payment?.fromAmount ?? "0",
+              price: ticket?.tokenFromPrice.toString() ?? "0",
+              tokenName: ticket?.payment?.fromToken?.symbol ?? "",
+            },
+            to: {
+              amount: ticket?.payment?.toAmount ?? "0",
+              price: ticket?.tokenToPrice.toString() ?? "0",
+              tokenName: ticket?.payment?.toToken?.symbol ?? "",
+            },
+
+            closedAt: ticket.closedAt,
+            createdAt: ticket.createdAt,
+          }))
+        : [],
+    [data],
+  );
+  return { data, prepareTicketsData, ...rest };
 };
 
 export const useAdminAllTickets = (status?: PaymentStatus) => {

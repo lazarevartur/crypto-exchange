@@ -48,7 +48,7 @@ export const cryptoChangeService = {
     return data;
   },
   getAllTickets: async (status?: PaymentStatus) => {
-    const { data } = await httpClient.get<Ticket[]>("/tickets", {
+    const { data } = await httpClient.get<ITicketResponse[]>("/tickets", {
       params: { status },
     });
 
