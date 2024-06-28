@@ -1,12 +1,11 @@
 // app/api/tokens/route.ts
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 import cache from "@/app/api/_lib/cache";
 import { authenticateUser, authorizeAdmin } from "@/app/api/_utils/utils";
+import prisma from "@/app/api/_lib/db";
 
-const prisma = new PrismaClient();
 
 // Определение схемы данных с использованием Zod
 const TokenSchema = z.object({
@@ -16,8 +15,9 @@ const TokenSchema = z.object({
   amount: z.number().positive(),
   price: z.number().positive(),
   network: z.string().nonempty(),
-  min: z.number().positive().default(0.1), // Обязательное поле с значением по умолчанию
-  infoText: z.string().optional(), // Необязательное поле
+  address: z.string().nonempty(),
+  min: z.number().positive().default(0.1),
+  infoText: z.string().optional()
 });
 
 export async function POST(req: NextRequest) {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, symbol, imageUrl, amount, price, network, min, infoText } = result.data;
+    const { name, symbol, imageUrl, amount, price, network, min, infoText, address } = result.data;
 
     // Проверка уникальности name и symbol
     const existingToken = await prisma.token.findFirst({
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
         network,
         min,
         infoText,
+        address
       },
     });
 
