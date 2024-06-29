@@ -4,6 +4,7 @@ import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { serialize } from "cookie";
 import prisma from "@/app/api/_lib/db";
 import dayjs from "dayjs";
+import { PaymentStatus } from "@prisma/client";
 
 const secret = process.env.JWT_SECRET || "your-secret-key";
 
@@ -151,3 +152,18 @@ export const numberFormatUS = (
 
 export const dateFormatWithTime = (date: Date) =>
   dayjs(date).format("HH:mm DD.MM.YYYY");
+
+export function sortPendingFirst<
+  T extends {
+    status: PaymentStatus;
+  },
+>(items: T[]): T[] {
+  return items.sort((a, b) => {
+    if (a.status === "PENDING" && b.status !== "PENDING") {
+      return -1;
+    } else if (a.status !== "PENDING" && b.status === "PENDING") {
+      return 1;
+    }
+    return 0;
+  });
+}

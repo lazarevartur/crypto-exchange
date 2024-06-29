@@ -33,6 +33,16 @@ export const cryptoChangeService = {
 
     return data;
   },
+  createTag: async (name: string) => {
+    const { data } = await httpClient.post("/tags", { name });
+
+    return data;
+  },
+  deleteTagByName: async (name: string) => {
+    const { data } = await httpClient.delete("/tags", { data: { name } });
+
+    return data;
+  },
   getAllPayments: async (status?: PaymentStatus) => {
     const { data } = await httpClient.get<IPayloadResponse[]>("/payments", {
       params: { status },

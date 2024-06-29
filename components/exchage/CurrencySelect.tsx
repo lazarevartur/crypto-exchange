@@ -11,7 +11,7 @@ import {
   SelectComponentsConfig,
   ValueContainerProps,
 } from "chakra-react-select";
-import React, { FC, ReactNode, useId, useMemo, useRef } from "react";
+import React, { FC, ReactNode, useId, useMemo, useRef, useState } from "react";
 import {
   Box,
   Flex,
@@ -26,6 +26,7 @@ import {
 } from "@chakra-ui/react";
 import { IReserveItem } from "@/lib/types/types";
 import { CATEGORIES } from "@/constants";
+import {useGetTags} from "@/http/query/tags";
 
 interface IMenuListDefaultProps
   extends MenuListProps<IReserveItem, boolean, GroupBase<IReserveItem>> {}
@@ -132,13 +133,13 @@ function RadioCard(props: UseRadioProps & { children: ReactNode }) {
   );
 }
 
-function Buttons() {
-  const options = CATEGORIES;
-
+function Buttons({ onChange }: { onChange: (val: string) => void }) {
+  const { prepareTags } = useGetTags();
+  const categories = useMemo(() => prepareTags(), [prepareTags]);
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "categories",
     defaultValue: "all",
-    onChange: console.log,
+    onChange,
   });
 
   const group = getRootProps();
@@ -147,7 +148,7 @@ function Buttons() {
   return (
     <HStack {...group}>
       <RadioCard {...allRadio}>All</RadioCard>
-      {options.map((value) => {
+      {categories.map((value) => {
         const radio = getRadioProps({ value });
         return (
           <RadioCard key={value} {...radio}>
@@ -159,14 +160,16 @@ function Buttons() {
   );
 }
 
-const MenuList: FC<IMenuListDefaultProps> = (props) => {
+const MenuList: FC<IMenuListDefaultProps> = ({ children, selectProps }) => {
+  // @ts-ignore
+  const { setSortBy } = selectProps;
   return (
     <Flex flexDir="column" display="contents">
       <Flex color="red" flexDir="column" px="10px" py="5px" gap="5px">
-        <Buttons />
+        <Buttons onChange={setSortBy} />
       </Flex>
       <Flex flexDir="column" maxH="400px" overflow="auto">
-        {props.children}
+        {children}
       </Flex>
     </Flex>
   );
@@ -238,6 +241,14 @@ export const CurrencySelect = ({
 }) => {
   const id = useId();
   const ref = useRef(null);
+  const [sortBy, setSortBy] = useState("all");
+  const sortedOptions = useMemo(
+    () =>
+      sortBy === "all"
+        ? options
+        : options.filter((item) => item.type.includes(sortBy)),
+    [options, sortBy],
+  );
 
   const { isOpen, onClose, onToggle } = useDisclosure();
 
@@ -264,7 +275,7 @@ export const CurrencySelect = ({
         isSearchable
         menuIsOpen
         toggleMenu={onToggle}
-        options={options}
+        options={sortedOptions}
         defaultValue={defaultValue}
         placeholder="Search your token"
         instanceId={id}
@@ -272,6 +283,8 @@ export const CurrencySelect = ({
         chakraStyles={styles}
         // @ts-ignore
         onChange={onChange}
+        // @ts-ignore
+        setSortBy={setSortBy}
         // @ts-ignore
         filterOption={createFilter(filterConfig)}
         // @ts-ignore

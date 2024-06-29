@@ -1,14 +1,11 @@
 // app/api/tags/route.ts
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 import cache from "@/app/api/_lib/cache";
 import { authenticateUser, authorizeAdmin } from "@/app/api/_utils/utils";
+import prisma from "@/app/api/_lib/db";
 
-const prisma = new PrismaClient();
-
-// Определение схемы данных с использованием Zod
 const TagSchema = z.object({
   name: z.string().nonempty(),
 });
@@ -97,6 +94,57 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+const DeleteTagSchema = z.object({
+  name: z.string().nonempty(),
+});
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { userId, error: authError } = authenticateUser(req);
+
+    if (authError) {
+      return authError;
+    }
+
+    const { user, error: roleError } = await authorizeAdmin(userId);
+
+    if (roleError) {
+      return roleError;
+    }
+
+    const result = DeleteTagSchema.safeParse(await req.json());
+
+    if (!result.success) {
+      return NextResponse.json(
+          { message: "Invalid input data", errors: result.error.errors },
+          { status: 400 }
+      );
+    }
+
+    const { name } = result.data;
+
+    // Удаление тега
+    const deletedTag = await prisma.tag.delete({
+      where: {
+        name,
+      },
+    });
+
+    // Инвалидация кэша после удаления тега
+    cache.del("tags");
+
+    return NextResponse.json(deletedTag, { status: 200 });
+  } catch (error) {
+    console.error("Error in DELETE /api/tags:", error);
+    return NextResponse.json(
+        { message: "Internal server error" },
+        { status: 500 }
     );
   } finally {
     await prisma.$disconnect();
