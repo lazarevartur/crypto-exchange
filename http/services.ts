@@ -37,6 +37,16 @@ export const cryptoChangeService = {
 
     return data;
   },
+  updateTokenById: async (body: ICreateTokenRequest & { id: string }) => {
+    const { data } = await httpClient.put("/tokens", body);
+
+    return data;
+  },
+  deleteTokenById: async (id: string) => {
+    const { data } = await httpClient.delete("/tokens", { data: { id } });
+
+    return data;
+  },
   getAllTokenTags: async () => {
     const { data } = await httpClient.get<string[]>("/tags");
 

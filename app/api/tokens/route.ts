@@ -20,6 +20,23 @@ const TokenSchema = z.object({
   infoText: z.string().optional()
 });
 
+const UpdateTokenSchema = z.object({
+  id: z.string().nonempty(),
+  name: z.string().nonempty().optional(),
+  symbol: z.string().nonempty().optional(),
+  imageUrl: z.string().url().optional(),
+  amount: z.number().positive().optional(),
+  price: z.number().positive().optional(),
+  network: z.string().nonempty().optional(),
+  address: z.string().nonempty().optional(),
+  min: z.number().positive().default(0.1).optional(),
+  infoText: z.string().optional(),
+});
+
+const DeleteTokenSchema = z.object({
+  id: z.string().nonempty(),
+});
+
 export async function POST(req: NextRequest) {
   try {
     const { userId, error: authError } = authenticateUser(req);
@@ -118,6 +135,111 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
         { message: "Internal server error" },
         { status: 500 },
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { userId, error: authError } = authenticateUser(req);
+
+    if (authError) {
+      return authError;
+    }
+
+    const { user, error: roleError } = await authorizeAdmin(userId);
+
+    if (roleError) {
+      return roleError;
+    }
+
+    const result = DeleteTokenSchema.safeParse(await req.json());
+
+    if (!result.success) {
+      return NextResponse.json(
+          { message: "Invalid input data", errors: result.error.errors },
+          { status: 400 }
+      );
+    }
+
+    const { id } = result.data;
+
+    // Удаление токена
+    const deletedToken = await prisma.token.delete({
+      where: {
+        id,
+      },
+    });
+
+    // Инвалидация кэша после удаления токена
+    cache.del("tokens");
+    cache.del("tags");
+
+    return NextResponse.json(deletedToken, { status: 200 });
+  } catch (error) {
+    console.error("Error in DELETE /api/tokens:", error);
+    return NextResponse.json(
+        { message: "Internal server error" },
+        { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { userId, error: authError } = authenticateUser(req);
+
+    if (authError) {
+      return authError;
+    }
+
+    const { user, error: roleError } = await authorizeAdmin(userId);
+
+    if (roleError) {
+      return roleError;
+    }
+
+    const result = UpdateTokenSchema.safeParse(await req.json());
+
+    if (!result.success) {
+      return NextResponse.json(
+          { message: "Invalid input data", errors: result.error.errors },
+          { status: 400 }
+      );
+    }
+
+    const { id, name, symbol, imageUrl, amount, price, network, min, infoText, address } = result.data;
+
+    // Обновление токена
+    const updatedToken = await prisma.token.update({
+      where: { id },
+      data: {
+        name,
+        symbol,
+        imageUrl,
+        amount,
+        price,
+        network,
+        min,
+        infoText,
+        address,
+      },
+    });
+
+    // Инвалидация кэша после обновления токена
+    cache.del("tokens");
+    cache.del("tags");
+
+    return NextResponse.json(updatedToken, { status: 200 });
+  } catch (error) {
+    console.error("Error in PUT /api/tokens:", error);
+    return NextResponse.json(
+        { message: "Internal server error" },
+        { status: 500 }
     );
   } finally {
     await prisma.$disconnect();
