@@ -4,6 +4,7 @@ import { Tab, TabPanel } from "@/components/tabs";
 import { Tickets } from "@/components/admin/tickets";
 import { useCheck } from "@/http/query/auth";
 import { Tags } from "@/components/admin/Tags";
+import { Tokens } from "@/components/admin/tokens";
 
 export default function ContactPage() {
   const { data } = useCheck();
@@ -24,6 +25,7 @@ export default function ContactPage() {
         <TabList gap="8px" mb="16px">
           <Tab>Тикеты</Tab>
           <Tab>Теги</Tab>
+          <Tab>Крипта</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -31,6 +33,9 @@ export default function ContactPage() {
           </TabPanel>
           <TabPanel>
             <Tags />
+          </TabPanel>
+          <TabPanel>
+            <Tokens />
           </TabPanel>
         </TabPanels>
       </Tabs>

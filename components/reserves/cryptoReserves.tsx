@@ -43,7 +43,7 @@ const ReserveItem = ({
   );
 };
 
-const ReserveItemsList = ({
+export const ReserveItemsList = ({
   data,
   filterBy,
 }: {
