@@ -7,6 +7,7 @@ import {
   TabList,
   TabPanels,
   Tabs,
+  Text,
 } from "@chakra-ui/react";
 import { useMemo } from "react";
 
@@ -19,36 +20,66 @@ const ReserveItem = ({
   name,
   amount,
   icon,
+  id,
+  onDelete,
+  onUpdate,
 }: {
   name: string;
   amount: number;
   icon: string;
+  id: string;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string) => void;
 }) => {
   return (
     <Flex
       bg="white"
       p="20px"
       w="calc(100% / 4 - 30px)"
-      gap="20px"
-      alignItems="center"
       boxShadow="0 1px 2px rgba(0, 0, 0, .16)"
       borderRadius="4px"
+      position="relative"
     >
-      <Image boxSize="32px" src={icon} alt={name} />
-      <Flex flexDir="column">
-        <Flex>{name}</Flex>
-        <Flex>{amount}</Flex>
+      <Flex>
+        <Flex gap="20px" alignItems="center">
+          <Image boxSize="32px" src={icon} alt={name} />
+          <Flex flexDir="column">
+            <Flex>{name}</Flex>
+            <Flex>{amount}</Flex>
+          </Flex>
+        </Flex>
+        <Flex gap="16px" position="absolute" right="8px" top="8px">
+          {onUpdate && (
+            <Image
+              src="/edit-button.svg"
+              alt="edit-button"
+              boxSize="20px"
+              cursor="pointer"
+              onClick={() => onUpdate(id)}
+            />
+          )}
+
+          {onDelete && (
+            <Text color="red" cursor="pointer" onClick={() => onDelete(id)}>
+              X
+            </Text>
+          )}
+        </Flex>
       </Flex>
     </Flex>
   );
 };
 
-const ReserveItemsList = ({
+export const ReserveItemsList = ({
   data,
   filterBy,
+  onDelete,
+  onUpdate,
 }: {
   data: IReserveItem[];
   filterBy?: string;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string) => void;
 }) => {
   const processedData = useMemo(() => {
     if (filterBy) {
@@ -58,10 +89,20 @@ const ReserveItemsList = ({
     return data;
   }, [data, filterBy]);
 
+  // const onDeleteHandler = onDelete ? (id: string) => onDelete(id) : undefined;
+
   return (
     <Flex flexWrap="wrap" gap="30px">
       {processedData.map(({ id, name, amount, icon }) => (
-        <ReserveItem key={id} name={name} amount={amount} icon={icon} />
+        <ReserveItem
+          key={id}
+          id={id}
+          name={name}
+          amount={amount}
+          icon={icon}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+        />
       ))}
     </Flex>
   );

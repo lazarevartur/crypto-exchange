@@ -3,6 +3,8 @@ import { Container, TabList, TabPanels, Tabs } from "@chakra-ui/react";
 import { Tab, TabPanel } from "@/components/tabs";
 import { Tickets } from "@/components/admin/tickets";
 import { useCheck } from "@/http/query/auth";
+import { Tags } from "@/components/admin/Tags";
+import { Tokens } from "@/components/admin/tokens";
 
 export default function ContactPage() {
   const { data } = useCheck();
@@ -22,10 +24,18 @@ export default function ContactPage() {
       <Tabs variant="unstyled">
         <TabList gap="8px" mb="16px">
           <Tab>Тикеты</Tab>
+          <Tab>Теги</Tab>
+          <Tab>Крипта</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
             <Tickets />
+          </TabPanel>
+          <TabPanel>
+            <Tags />
+          </TabPanel>
+          <TabPanel>
+            <Tokens />
           </TabPanel>
         </TabPanels>
       </Tabs>

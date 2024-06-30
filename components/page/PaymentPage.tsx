@@ -141,7 +141,7 @@ export const PaymentPage = () => {
           <Flex flexDir="column" fontSize="16px">
             <Text fontWeight={600}>Адрес получения:</Text>
             <Text color="#fcbf11" fontWeight={600}>
-              bnb10tnw5g5n0gvhutyzkxweem3sxsy7xhe89f7au8
+              {payment.fromToken?.address}
             </Text>
           </Flex>
           <Flex gap="10px">

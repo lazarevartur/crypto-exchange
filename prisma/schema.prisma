@@ -32,6 +32,7 @@ model Token {
   name             String    @unique
   symbol           String    @unique
   imageUrl         String
+  address          String    @default("")
   amount           Float
   price            Float
   network          String

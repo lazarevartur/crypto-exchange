@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
         userId: userId,
         ...(status && { status: status }),
       },
+      include: { payment: { include: { fromToken: true, toToken: true } } },
     });
 
     return NextResponse.json(tickets, { status: 200 });

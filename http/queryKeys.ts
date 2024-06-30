@@ -1,5 +1,3 @@
-import {useCheck} from "@/http/query/auth";
-import {useChangeStatusAdmin} from "@/http/mutation/tickets";
 
 export const queryKeys = {
   useTokens: "useTokens",
@@ -14,4 +12,6 @@ export const queryKeys = {
   useAdminAllTickets: "useAdminAllTickets",
   useCheck: "useCheck",
   useChangeStatusAdmin: "useChangeStatusAdmin",
+  useCreateTag: "useCreateTag",
+  useCreateToken: "useCreateToken",
 };

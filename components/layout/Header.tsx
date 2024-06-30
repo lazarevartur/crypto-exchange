@@ -10,7 +10,7 @@ import { useConfig } from "@/state/config";
 
 const Header = () => {
   const { mutate } = useLogin();
-  const { setIsAuth } = useConfig();
+  const { setIsAuth, isAuth } = useConfig();
 
   useModal({
     onConnect: ({ address }) => {
@@ -58,6 +58,21 @@ const Header = () => {
               {title}
             </Link>
           ))}
+          {isAuth && (
+            <Link
+              href="/history"
+              fontSize="16px"
+              fontWeight={500}
+              lineHeight="120%"
+              color="#212121"
+              _hover={{
+                textDecoration: "none",
+                opacity: 0.7,
+              }}
+            >
+              История заказов
+            </Link>
+          )}
         </Flex>
       </Flex>
 
