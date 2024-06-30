@@ -17,6 +17,17 @@ export interface IPaymentRequest {
   account?: string;
   network: string;
 }
+export interface ICreateTokenRequest {
+  name: string;
+  address: string;
+  symbol: string;
+  imageUrl: string;
+  infoText?: string;
+  network: string;
+  amount: number;
+  price: number;
+  min: number;
+}
 
 export interface IUpdateStatusRequest {
   paymentId: string;

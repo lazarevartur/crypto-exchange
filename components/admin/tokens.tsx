@@ -21,18 +21,10 @@ import { Tab, TabPanel } from "@/components/tabs";
 import { useGetTags } from "@/http/query/tags";
 import { ReserveItemsList } from "@/components/reserves";
 import { useForm } from "react-hook-form";
+import { ICreateTokenRequest } from "@/lib/types/types";
+import { useCreateToken } from "@/http/mutation/tokens";
 
-interface Inputs {
-  name: string;
-  address: string;
-  symbol: string;
-  imageUrl: string;
-  infoText?: string;
-  network: string;
-  amount: number;
-  price: number;
-  min: number;
-}
+interface Inputs extends ICreateTokenRequest {}
 
 export const Tokens = () => {
   const { prepareTokens } = useTokens();
@@ -40,11 +32,15 @@ export const Tokens = () => {
   const { prepareTags } = useGetTags();
   const categories = useMemo(() => prepareTags(), [prepareTags]);
   const { register, handleSubmit } = useForm<Inputs>();
+  const { mutate, isPending } = useCreateToken();
 
-  const onSubmit = ({ name }: Inputs) => {
-    // if (name) {
-    //   mutate(name);
-    // }
+  const onSubmit = (data: Inputs) => {
+    mutate({
+      ...data,
+      price: Number(data.price),
+      min: Number(data.min),
+      amount: Number(data.amount)
+    });
   };
 
   return (
@@ -68,7 +64,12 @@ export const Tokens = () => {
             >
               <InputGroup maxW="30%">
                 <InputLeftAddon>Имя токена</InputLeftAddon>
-                <Input {...register("name")} type="text" placeholder="Name" />
+                <Input
+                  {...register("name")}
+                  type="text"
+                  placeholder="Name"
+                  isRequired
+                />
               </InputGroup>
               <InputGroup maxW="30%">
                 <InputLeftAddon>Адрес</InputLeftAddon>
@@ -76,6 +77,7 @@ export const Tokens = () => {
                   {...register("address")}
                   type="text"
                   placeholder="Address"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -84,6 +86,7 @@ export const Tokens = () => {
                   {...register("symbol")}
                   type="text"
                   placeholder="Symbol"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -92,6 +95,7 @@ export const Tokens = () => {
                   {...register("imageUrl")}
                   type="text"
                   placeholder="Url картинки"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -100,6 +104,7 @@ export const Tokens = () => {
                   {...register("infoText")}
                   type="text"
                   placeholder="Доп. текст"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -108,6 +113,7 @@ export const Tokens = () => {
                   {...register("network")}
                   type="text"
                   placeholder="Network"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -116,6 +122,7 @@ export const Tokens = () => {
                   {...register("amount")}
                   type="number"
                   placeholder="Количество токенов"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -123,7 +130,9 @@ export const Tokens = () => {
                 <Input
                   {...register("price")}
                   type="number"
+                  step="0.01"
                   placeholder="Цена"
+                  isRequired
                 />
               </InputGroup>
               <InputGroup maxW="30%">
@@ -131,10 +140,14 @@ export const Tokens = () => {
                 <Input
                   {...register("min")}
                   type="number"
+                  step="0.01"
                   placeholder="Мин.колов"
+                  isRequired
                 />
               </InputGroup>
-              <Button type="submit">Создать токен</Button>
+              <Button type="submit" isLoading={isPending}>
+                Создать токен
+              </Button>
             </Flex>
           </AccordionPanel>
         </AccordionItem>

@@ -1,3 +1,4 @@
+
 export const queryKeys = {
   useTokens: "useTokens",
   useGetTags: "useGetTags",
@@ -12,4 +13,5 @@ export const queryKeys = {
   useCheck: "useCheck",
   useChangeStatusAdmin: "useChangeStatusAdmin",
   useCreateTag: "useCreateTag",
+  useCreateToken: "useCreateToken",
 };
